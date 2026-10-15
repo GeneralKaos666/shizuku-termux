@@ -1,0 +1,13 @@
+*.dex
+*.so
+*.apk
+*.deb
+*.log
+_vendor/
+VERIFY.md
+AUDIT-FUSAO.md
+SEARCH-FREEBUFF.md
+plan.md
+extracts/
+/home/rianprei/
+WG7*

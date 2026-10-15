@@ -1,0 +1,12 @@
+Package: shizuku-termux
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: shizuku-termux fusion
+Description: Ponte Termux<->Shizuku (núcleo único)
+ Instala, valida e usa Shizuku/rish no Termux dentro do protocolo
+ oficial da Rikka. Zero .dex/.so/.apk no pacote; a extração do DEX
+ acontece no device via `shizuku install --apk <caminho>` ou
+ `shizuku install` (se `pm` encontrar moe.shizuku.privileged.api).
+Depends: bash, coreutils, findutils, unzip

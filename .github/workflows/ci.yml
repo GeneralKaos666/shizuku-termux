@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y unzip bash coreutils findutils
+
+      - name: Executar suíte de testes host
+        run: |
+          bash tests/test-*.sh

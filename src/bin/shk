@@ -1,0 +1,3 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# shk — alias para shizuku (mesmo CLI, dispatch por $0).
+exec "$(dirname "$0")/shizuku" "$@"

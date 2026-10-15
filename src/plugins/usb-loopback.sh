@@ -3,9 +3,9 @@
 
 st_plugin_usb_loopback() {
     echo "usb-loopback: configurando adb tcpip 5555 ..."
-    adb tcpip 5555 || return $?
+    st_adb tcpip 5555 || return $?
     echo "Conectando em 127.0.0.1:5555 ..."
-    adb connect 127.0.0.1:5555 || return $?
+    st_adb connect 127.0.0.1:5555 || return $?
     echo "OK: loopback USB ativo"
     return 0
 }

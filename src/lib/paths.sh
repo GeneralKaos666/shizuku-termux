@@ -39,3 +39,36 @@ st_pm_path() {
 st_apk_path_via_pm() {
     "$(st_pm_path)" path moe.shizuku.privileged.api 2>/dev/null | sed 's/^package://' || true
 }
+
+# Resolve o binário adb a usar.
+# Ordem: ST_ADB (override de teste) -> ~/.local/bin/adb (front-end unificado)
+#        -> command -v adb (PATH) -> $PREFIX/bin/termux-adb (OTG patchado) -> falha.
+st_adb_bin() {
+    if [ -n "${ST_ADB:-}" ] && [ -x "${ST_ADB}" ]; then
+        echo "${ST_ADB}"
+        return 0
+    fi
+    if [ -x "${HOME:-}/.local/bin/adb" ]; then
+        echo "${HOME:-}/.local/bin/adb"
+        return 0
+    fi
+    local p
+    p="$(command -v adb 2>/dev/null || true)"
+    if [ -n "${p}" ]; then
+        echo "${p}"
+        return 0
+    fi
+    if [ -x "${PREFIX:-}/bin/termux-adb" ]; then
+        echo "${PREFIX:-}/bin/termux-adb"
+        return 0
+    fi
+    echo "ERRO: adb ausente. Instale termux-adb: https://github.com/rianprei/termux-adb" >&2
+    return 1
+}
+
+# Chama o binário adb resolvido com "$@".
+st_adb() {
+    local bin
+    bin="$(st_adb_bin)" || return $?
+    "${bin}" "$@"
+}

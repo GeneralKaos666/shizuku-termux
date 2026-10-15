@@ -13,24 +13,24 @@ st_plugin_adb_connect() {
             local porta="$2" codigo="$3"
             [ -n "$porta" ] && [ -n "$codigo" ] || { echo "ERRO: uso: adb-connect pair <porta> <codigo>" >&2; return 1; }
             is_port "$porta" || { echo "ERRO: porta invalida: $porta" >&2; return 1; }
-            command -v adb >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
+            st_adb_bin >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
             echo "Emparelhando wireless: $CONNECT_HOST:$porta"
-            adb pair "$CONNECT_HOST:$porta" "$codigo" || return $?
+            st_adb pair "$CONNECT_HOST:$porta" "$codigo" || return $?
             echo "OK: emparelhado em $CONNECT_HOST:$porta"
             return 0
             ;;
         status)
-            command -v adb >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
+            st_adb_bin >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
             echo "Dispositivos ADB:"
-            adb devices
+            st_adb devices
             return 0
             ;;
         disconnect)
             local porta="${2:-5555}"
             is_port "$porta" || { echo "ERRO: porta invalida: $porta" >&2; return 1; }
-            command -v adb >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
+            st_adb_bin >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
             echo "Desconectando: $CONNECT_HOST:$porta"
-            adb disconnect "$CONNECT_HOST:$porta" || return $?
+            st_adb disconnect "$CONNECT_HOST:$porta" || return $?
             echo "OK: desconectado"
             return 0
             ;;
@@ -51,11 +51,11 @@ st_plugin_adb_connect() {
             local porta="$mode"
             [ -n "$porta" ] || { echo "ERRO: uso: adb-connect <porta> | pair <porta> <codigo> | status | disconnect [porta] | wf" >&2; return 1; }
             is_port "$porta" || { echo "ERRO: porta invalida: $porta" >&2; return 1; }
-            command -v adb >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
+            st_adb_bin >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
             echo "Conectando debug sem fio: $CONNECT_HOST:$porta"
-            adb start-server >/dev/null 2>&1 || true
-            adb connect "$CONNECT_HOST:$porta" || return $?
-            adb -s "$CONNECT_HOST:$porta" wait-for-device >/dev/null 2>&1 || return $?
+            st_adb start-server >/dev/null 2>&1 || true
+            st_adb connect "$CONNECT_HOST:$porta" || return $?
+            st_adb -s "$CONNECT_HOST:$porta" wait-for-device >/dev/null 2>&1 || return $?
             echo "OK: conectado em $CONNECT_HOST:$porta"
             return 0
             ;;

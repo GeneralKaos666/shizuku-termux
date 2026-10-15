@@ -23,6 +23,7 @@ o que necessário. Nenhum arquivo GPL foi copiado. Lista de atribuição:
 |-------|-------------------|------|
 | crowforkotlin/quick-shell | `--source latest` (download APK oficial via GitHub API) + fallback `libshizuku.so --apk=` para start do daemon; `adb-connect` (debug sem fio em 127.0.0.1 sem tcpip) + `wf` (abre Wireless Debugging) | `src/lib/extract-apk.sh` (`st_download_official_apk`), `src/plugins/start-daemon.sh`, `src/plugins/adb-connect.sh` |
 | auto-brevent (ideia) | `wait`: poll `rish -c true` até Shizuku responder | `src/lib/doctor.sh` (`st_wait`) |
+| rianprei/termux-adb | front-end `adb` unificado (OTG + nativo); resolução do binário via `st_adb` | `src/lib/paths.sh` (`st_adb_bin`, `st_adb`); código não copiado |
 
 ## Veneno recusado (não entra no núcleo)
 tinyurl, `curl … | bash`, `gist … | bash`, DEX/`.so` no git, `chmod +w/+rwx` no DEX,

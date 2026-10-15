@@ -76,6 +76,17 @@ $PREFIX/bin/shk      cópia do CLI (dispatch por $0)
 - `PKG` placeholder vivo
 - Arquivo GPL do rish4termux (o switch é reimplementado, não copiado)
 
+## Companheiro: termux-adb
+
+Os verbos `wireless`, `usb-loopback`, `adb-connect` e `start-daemon` resolvem o binário `adb` através de `st_adb` (definido em `src/lib/paths.sh`). A ordem de resolução é:
+
+1. Variável de ambiente `ST_ADB` (override para testes).
+2. `~/.local/bin/adb` — front-end unificado do [rianprei/termux-adb](https://github.com/rianprei/termux-adb), que roteia OTG (`termux-adb` + termux-usb) vs nativo (`$PREFIX/bin/adb`).
+3. `command -v adb` (PATH).
+4. `$PREFIX/bin/termux-adb` (último recurso, patchado OTG).
+
+Nenhum instalador ou binário do termux-adb é vendindo neste repositório.
+
 ## Licença e atribuição
 
 Código próprio sob [MIT License](LICENSE). Ideias de origem dos wrappers comunitários em [ATTRIBUTION.md](ATTRIBUTION.md).

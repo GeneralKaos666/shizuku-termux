@@ -51,6 +51,20 @@ st_doctor() {
     aid="$(st_app_id)"
     echo "INFO: RISH_APPLICATION_ID=$aid"
 
+    # 6b. Adb resolvido (informativo, não derruba rc se faltar)
+    info_adb="$(st_adb_bin 2>/dev/null || true)"
+    if [ -x "${HOME:-}/.local/bin/adb" ]; then
+        info_tadb="sim (${HOME:-}/.local/bin/adb)"
+    elif [ -x "${PREFIX:-}/bin/termux-adb" ]; then
+        info_tadb="sim (${PREFIX:-}/bin/termux-adb)"
+    elif command -v adb >/dev/null 2>&1; then
+        info_tadb="sim ($(command -v adb))"
+    else
+        info_tadb="não"
+    fi
+    echo "INFO: adb=${info_adb:-ausente}"
+    echo "INFO: termux-adb=$info_tadb"
+
     # 7. Shizuku up? (device)
     if command -v rish >/dev/null 2>&1; then
         uid="$(rish -c id 2>/dev/null || true)"

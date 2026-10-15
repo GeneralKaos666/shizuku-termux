@@ -12,8 +12,8 @@ PASS=0; FAIL=0
 echo "--- teste: contém start.sh oficial ---"
 grep -q 'start.sh' "$PLUGIN" && { echo "OK: start.sh presente"; PASS=$((PASS+1)); } || { echo "FALHA: start.sh ausente"; FAIL=$((FAIL+1)); }
 
-echo "--- teste: contém pm path para achar APK ---"
-grep -q 'pm path moe.shizuku.privileged.api' "$PLUGIN" && { echo "OK: pm path presente"; PASS=$((PASS+1)); } || { echo "FALHA: pm path ausente"; FAIL=$((FAIL+1)); }
+echo "--- teste: contém st_adb shell pm path para achar APK ---"
+grep -q 'st_adb shell pm path moe.shizuku.privileged.api' "$PLUGIN" && { echo "OK: st_adb shell pm path presente"; PASS=$((PASS+1)); } || { echo "FALHA: st_adb shell pm path ausente"; FAIL=$((FAIL+1)); }
 
 echo "--- teste: contém libshizuku.so ---"
 grep -q 'libshizuku.so' "$PLUGIN" && { echo "OK: libshizuku.so presente"; PASS=$((PASS+1)); } || { echo "FALHA: libshizuku.so ausente"; FAIL=$((FAIL+1)); }
@@ -21,11 +21,17 @@ grep -q 'libshizuku.so' "$PLUGIN" && { echo "OK: libshizuku.so presente"; PASS=$
 echo "--- teste: contém --apk= ---"
 grep -q -- '--apk=' "$PLUGIN" && { echo "OK: --apk= presente"; PASS=$((PASS+1)); } || { echo "FALHA: --apk= ausente"; FAIL=$((FAIL+1)); }
 
-echo "--- teste: NÃO contém adb tcpip / adb pair / adb connect 127.0.0.1 ---"
-if grep -qE 'adb (tcpip|pair|connect 127\.0\.0\.1)' "$PLUGIN"; then
+echo "--- teste: NÃO contém st_adb tcpip / st_adb pair / st_adb connect 127.0.0.1 ---"
+if grep -qE 'st_adb (tcpip|pair|connect 127\.0\.0\.1)' "$PLUGIN"; then
     echo "FALHA: contém comandos de rede proibidos"; FAIL=$((FAIL+1))
 else
     echo "OK: sem comandos de rede proibidos"; PASS=$((PASS+1)); fi
+
+echo "--- teste: NÃO contém adb nu (deve ser st_adb) ---"
+if grep -Eq '\badb (shell|pm|dumpsys|test)' "$PLUGIN"; then
+    echo "FALHA: contem adb nu (deve ser st_adb)"; FAIL=$((FAIL+1))
+else
+    echo "OK: todo adb eh via st_adb"; PASS=$((PASS+1)); fi
 
 echo "--- teste: NÃO contém pm install / su / setenforce ---"
 if grep -qE 'pm install|su |setenforce' "$PLUGIN"; then

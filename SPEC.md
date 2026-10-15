@@ -20,6 +20,7 @@ Contrato único do CLI `shizuku` / `shk` / `rish`. Aprovado pelo dono. União da
 |----------|-------------|--------------|
 | `RISH_APPLICATION_ID` | `$TERMUX_APP__PACKAGE_NAME` se set, senão `com.termux` | SIM. Nunca `PKG`. |
 | `RISH_PRESERVE_ENV` | Não definido pelo wrapper. O loader Java do Shizuku honra se o usuário exportar; este wrapper não aplica default `0`/`1`. | Não. |
+| `ST_ADB` | Override do binário `adb` para testes. Se definido e executável, `st_adb` usa esse caminho. | Não. |
 | `ST_PLUGINS` | Não usado no núcleo. Todos os plugins de ponte carregam sempre; afeta apenas plugins futuros em `plugins/consumers/`. |
 
 ## 3. Exit codes (sem colisão)

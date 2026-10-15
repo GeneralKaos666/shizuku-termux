@@ -19,9 +19,9 @@ st_plugin_wireless() {
 
     echo "Emparelhando wireless: $target"
     if [ -n "$code" ]; then
-        adb pair "$target" "$code" || return $?
+        st_adb pair "$target" "$code" || return $?
     fi
-    adb connect "$target" || return $?
+    st_adb connect "$target" || return $?
     echo "OK: conectado via wireless em $target"
     return 0
 }

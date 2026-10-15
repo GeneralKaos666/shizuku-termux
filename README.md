@@ -34,7 +34,7 @@ shizuku doctor
 | `shizuku` / `shk` | `info\|open\|stop\|exec <cmd>\|shell\|version\|doctor\|install\|uninstall` |
 | `uninstall` | Remove launcher/DEX/árvore/symlink (sem tinyurl) |
 | `sui --backend shizuku\|sui` | Switch de backend (default shizuku) |
-| `wireless --target IP:porta --codigo XXX` | Emparelha adb via wireless (NÃO 127.0.0.1) |
+| `wireless --target IP:porta --code XXX` | Emparelha adb via wireless (NÃO 127.0.0.1) |
 | `usb-loopback` | `adb tcpip 5555` + `connect 127.0.0.1:5555` |
 | `keepalive start\|stop\|status` | Heartbeat: reexecuta start.sh se `rish -c id` falhar |
 | `pm-install <apk>` | Instala APK via `rish` só se `uid 2000` |

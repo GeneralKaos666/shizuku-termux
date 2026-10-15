@@ -7,8 +7,8 @@ st_plugin_wireless() {
         case "$1" in
             --target) target="${2:-}"; shift 2 ;;
             --target=*) target="${1#--target=}"; shift ;;
-            --code) code="${2:-}"; shift 2 ;;
-            --code=*) code="${1#--code=}"; shift ;;
+            --code|--codigo) code="${2:-}"; shift 2 ;;
+            --code=*|--codigo=*) code="${1#*=}"; shift ;;
             *) shift ;;
         esac
     done

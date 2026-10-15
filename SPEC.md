@@ -19,8 +19,8 @@ Contrato único do CLI `shizuku` / `shk` / `rish`. Aprovado pelo dono. União da
 | Variável | Valor padrão | Obrigatório? |
 |----------|-------------|--------------|
 | `RISH_APPLICATION_ID` | `$TERMUX_APP__PACKAGE_NAME` se set, senão `com.termux` | SIM. Nunca `PKG`. |
-| `RISH_PRESERVE_ENV` | `0` (ADB), `1` (root/Sui) | Não. |
-| `ST_PLUGINS` | lista de plugins consumers habilitados | Não. Afeta apenas `plugins/consumers/`. |
+| `RISH_PRESERVE_ENV` | Não definido pelo wrapper. O loader Java do Shizuku honra se o usuário exportar; este wrapper não aplica default `0`/`1`. | Não. |
+| `ST_PLUGINS` | Não usado no núcleo. Todos os plugins de ponte carregam sempre; afeta apenas plugins futuros em `plugins/consumers/`. |
 
 ## 3. Exit codes (sem colisão)
 
@@ -41,7 +41,7 @@ Contrato único do CLI `shizuku` / `shk` / `rish`. Aprovado pelo dono. União da
 | `install [--apk <arquivo>|--source latest]` | Extrai APK → `$PREFIX/lib/shizuku-termux/{rish,rish_shizuku.dex,librish.so?}`; `--apk` usa arquivo local; `--source latest` baixa APK oficial `*.apk` do release RikkaApps/Shizuku (GitHub API, nunca `releases/latest/download/rish`); sem nenhum dos dois e sem `pm`: exit 4. |
 | `doctor` | Shizuku up? dex existe? dex non-writable? RISH_APPLICATION_ID? `rish -c id` → uid |
 | `rish` | Launcher; falha se dex writable ou ausente |
-| `shizuku` / `shk` | `info|open|stop|exec|shell|version|doctor|install|uninstall` |
+| `shizuku` / `shk` | `info|open|stop|exec|shell|version|doctor|install|uninstall|adb-connect|wait` |
 | `sui` | `--backend shizuku|sui` (default shizuku) |
 | `wireless` | `adb pair/connect IP:porta + código` (NÃO 127.0.0.1) |
 | `usb-loopback` | `adb tcpip 5555` + `connect 127.0.0.1:5555` |

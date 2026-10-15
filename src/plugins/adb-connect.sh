@@ -35,16 +35,17 @@ st_plugin_adb_connect() {
             return 0
             ;;
         wf)
-            echo "Abrindo configuracao de debug sem fio (Wireless Debugging) ..."
-            if am start -a android.settings.APPLICATION_DEVELOPMENT_SETTINGS \
-                    --es ':settings:fragment_args_key' toggle_adb_wireless >/dev/null 2>&1; then
-                echo "OK: pagina de debug sem fio aberta"
+            echo "Abrindo configuracao de debug sem fio (Wireless Debugging) via rish ..."
+            if st_rish -c 'am start -a android.settings.APPLICATION_DEVELOPMENT_SETTINGS --es ":settings:fragment_args_key" toggle_adb_wireless' >/dev/null 2>&1; then
+                echo "OK: pagina de debug sem fio aberta via rish"
                 return 0
             fi
-            am start -a android.settings.DEVELOPMENT_SETTINGS >/dev/null 2>&1 \
-                || { echo "ERRO: nao foi possível abrir configuracao de desenvolvedor" >&2; return 1; }
-            echo "OK: pagina de desenvolvedor aberta"
-            return 0
+            if st_rish -c 'am start -a android.settings.DEVELOPMENT_SETTINGS' >/dev/null 2>&1; then
+                echo "OK: pagina de desenvolvedor aberta via rish"
+                return 0
+            fi
+            echo "ERRO: nao foi possível abrir configuracao de desenvolvedor via rish" >&2
+            return 1
             ;;
         ""|*)
             local porta="$mode"

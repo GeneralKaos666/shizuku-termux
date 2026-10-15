@@ -58,21 +58,21 @@ shizuku <verbo> [args]
 
 .SH DESCRIPTION
 Instala, valida e usa Shizuku/rish no Termux dentro do protocolo
-oficial da Rikka. O pacote .deb N\u00c3O cont\u00c9M .dex/.so/.apk;
-a extra\u00e7\u00e3o do DEX acontece no device via \`shizuku install\`.
+oficial da Rikka. O pacote .deb NÃO contém .dex/.so/.apk;
+a extração do DEX acontece no device via \`shizuku install\`.
 
 .SH VERBOS
-install      Extrai APK Shizuku \u2192 $PREFIX/lib/shizuku-termux/
-doctor       Checa sa\u00fade do n\u00facleo
+install      Extrai APK Shizuku → $PREFIX/lib/shizuku-termux/
+doctor       Checa saúde do núcleo
 rish <args>  Passa args ao launcher rish remoto
 info|open|stop|exec|shell|version
-             Opera\u00e7\u00f5es do Shizuku
+             Operações do Shizuku
 uninstall    Remove launcher/dex/symlink
 sui          \--backend shizuku|sui
-wireless     adb pair/connect IP:porta + c\u00f3digo
+wireless     adb pair/connect IP:porta + código
 usb-loopback adb tcpip 5555 + connect 127.0.0.1:5555
 keepalive    Heartbeat (start|stop|status)
-pm-install   pm install via rish s\u00f3 se uid 2000
+pm-install   pm install via rish só se uid 2000
 start-daemon start.sh oficial via adb
 aliases      spm/sam opcionais
 
@@ -91,7 +91,7 @@ if command -v dpkg-deb >/dev/null 2>&1; then
     echo "---"
     dpkg-deb --info "$DEB_OUT"
 else
-    echo "AVISO: dpkg-deb n\u00e3o encontrado; .deb n\u00e3o gerado."
+    echo "AVISO: dpkg-deb não encontrado; .deb não gerado."
     echo "Estrutura pronta em: $DEB_DIR"
     exit 0
 fi

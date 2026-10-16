@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
-# Teste: st_wait em doctor.sh. Sem device, sem rede adb real.
+# Test: st_wait in doctor.sh. No device, no real adb network.
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$SCRIPT_DIR/../src/lib/paths.sh"
 . "$SCRIPT_DIR/../src/lib/doctor.sh"
 
-# set -e vindo de extract-apk.sh (via paths.sh) pode encerar o teste; desligamos.
+# set -e coming from extract-apk.sh (via paths.sh) could end the test; we disable it.
 set +e
 
 PASS=0; FAIL=0
 
-echo "--- teste 1: st_wait 0 com rish ausente -> return 2 (rapido) ---"
-inicio=$(date +%s)
+echo "--- test 1: st_wait 0 with rish missing -> return 2 (fast) ---"
+start_ts=$(date +%s)
 st_wait 0 >/tmp/wait1.out 2>&1 || rc=$?
-fim=$(date +%s)
-dur=$((fim - inicio))
-[ "$rc" = "2" ] && { echo "OK: return 2 (Shizuku down)"; PASS=$((PASS+1)); } || { echo "FALHA: esperado 2, obteve ${rc:-}"; FAIL=$((FAIL+1)); }
-[ "$dur" -lt 5 ] && { echo "OK: nao demorou ($dur s)"; PASS=$((PASS+1)); } || { echo "FALHA: demorou demais ($dur s)"; FAIL=$((FAIL+1)); }
+end_ts=$(date +%s)
+elapsed=$((end_ts - start_ts))
+[ "$rc" = "2" ] && { echo "OK: return 2 (Shizuku down)"; PASS=$((PASS+1)); } || { echo "FAIL: expected 2, got ${rc:-}"; FAIL=$((FAIL+1)); }
+[ "$elapsed" -lt 5 ] && { echo "OK: did not take long ($elapsed s)"; PASS=$((PASS+1)); } || { echo "FAIL: took too long ($elapsed s)"; FAIL=$((FAIL+1)); }
 
-echo "--- teste 2: st_wait 0 com rish que sai 0 -> return 0 ---"
+echo "--- test 2: st_wait 0 with a rish that exits 0 -> return 0 ---"
 tmpbin="$(mktemp -d)"
 cat > "$tmpbin/rish" <<'RISH'
 #!/bin/bash
@@ -28,12 +28,12 @@ RISH
 chmod 755 "$tmpbin/rish"
 rc=0
 PATH="$tmpbin:$PATH" st_wait 0 >/tmp/wait2.out 2>&1 || rc=$?
-[ "$rc" = "0" ] && { echo "OK: return 0 (Shizuku respondeu)"; PASS=$((PASS+1)); } || { echo "FALHA: esperado 0, obteve ${rc:-}"; FAIL=$((FAIL+1)); }
+[ "$rc" = "0" ] && { echo "OK: return 0 (Shizuku responded)"; PASS=$((PASS+1)); } || { echo "FAIL: expected 0, got ${rc:-}"; FAIL=$((FAIL+1)); }
 rm -rf "$tmpbin"
 
-echo "--- teste 3: st_wait sem argumento usa default 60 (nao testa tempo, so nao trava) ---"
+echo "--- test 3: st_wait without an argument uses default 60 (does not test time, only that it does not hang) ---"
 st_wait 0 >/dev/null 2>&1
-echo "OK: st_wait sem erro de sintaxe"; PASS=$((PASS+1))
+echo "OK: st_wait has no syntax error"; PASS=$((PASS+1))
 
-if [ $FAIL -eq 0 ]; then echo "RESULTADO: TESTES wait PASSARAM"; else echo "RESULTADO: $FAIL FALHA(S)"; fi
+if [ $FAIL -eq 0 ]; then echo "RESULT: wait tests PASSED"; else echo "RESULT: $FAIL FAILURE(S)"; fi
 exit $FAIL

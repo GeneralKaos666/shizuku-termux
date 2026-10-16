@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# shizuku — CLI único do núcleo shizuku-termux.
-# Dispatch por $0: shizuku | shk | rish
+# shizuku — single CLI of the shizuku-termux core.
+# Dispatch by $0: shizuku | shk | rish
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -10,7 +10,7 @@ else
     ST_ROOT="${PREFIX}/lib/shizuku-termux"
 fi
 
-# Árvore fonte tem prioridade (testes host); após install, sourca de ST_ROOT.
+# Source tree takes priority (host tests); after install, sources from ST_ROOT.
 if [ -f "$SCRIPT_DIR/../lib/paths.sh" ]; then
     LIB_DIR="$SCRIPT_DIR/../lib"
     PLUGIN_DIR="$SCRIPT_DIR/../plugins"
@@ -25,7 +25,7 @@ fi
 # shellcheck source=lib/doctor.sh
 . "$LIB_DIR/doctor.sh"
 
-# Carrega plugins de ponte (sempre existem).
+# Load bridge plugins (always present).
 for p in sui wireless keepalive usb-loopback pm-install start-daemon aliases adb-connect; do
     if [ -f "$PLUGIN_DIR/$p.sh" ]; then
         . "$PLUGIN_DIR/$p.sh"
@@ -34,29 +34,29 @@ done
 
 st_usage() {
     cat <<EOF
-Uso: shizuku <verbo> [args]
-Verbos:
-  install [--apk <arquivo>|--source latest]
-          Extrai APK Shizuku → ${PREFIX:-}/lib/shizuku-termux/
-  doctor        Checa saúde do núcleo (dex, app id, uid)
-  rish <args>   Passa args ao launcher rish remoto
-  info          Versão/status do Shizuku
-  open          Abre app Shizuku (am start)
-  stop          Para o Shizuku
-  exec <cmd>    Executa comando via rish
-  shell         Shell interativo via rish
-  version       Versão do CLI
-  uninstall     Remove launcher/dex/symlink (sem tinyurl)
+Usage: shizuku <verb> [args]
+Verbs:
+  install [--apk <file>|--source latest]
+          Extracts Shizuku APK → ${PREFIX:-}/lib/shizuku-termux/
+  doctor        Checks core health (dex, app id, uid)
+  rish <args>   Passes args to the remote rish launcher
+  info          Shizuku version/status
+  open          Opens Shizuku app (am start)
+  stop          Stops Shizuku
+  exec <cmd>    Runs a command via rish
+  shell         Interactive shell via rish
+  version       CLI version
+  uninstall     Removes launcher/dex/symlink (no tinyurl)
   sui           --backend shizuku|sui
-  wireless      adb pair/connect IP:porta + código
+  wireless      adb pair/connect IP:port + code
   usb-loopback  adb tcpip 5555 + connect 127.0.0.1:5555
-  keepalive     Heartbeat do jecis (reexecuta start.sh se rish falhar)
-  pm-install    pm install via rish só se uid 2000
-  start-daemon  Start daemon Shizuku via adb (start.sh oficial, fallback libshizuku.so)
-  adb-connect   Debug sem fio em 127.0.0.1: porta | pair | status | disconnect | wf
-  wait          Espera Shizuku responder (rish -c true)
-  aliases       spm/sam (opcional)
-  help          Esta ajuda
+  keepalive     jecis heartbeat (reruns start.sh if rish fails)
+  pm-install    pm install via rish only if uid 2000
+  start-daemon  Starts Shizuku daemon via adb (official start.sh, fallback libshizuku.so)
+  adb-connect   Wireless debugging on 127.0.0.1: port | pair | status | disconnect | wf
+  wait          Waits for Shizuku to respond (rish -c true)
+  aliases       spm/sam (optional)
+  help          This help
 EOF
 }
 
@@ -65,33 +65,33 @@ st_version() { echo "shizuku-termux fusion 1.0.0"; }
 st_install() {
     local dest apk="" source_latest=0
     dest="$(st_prefix_lib)"
-    # Parseia --apk <arquivo> e --source latest
+    # Parse --apk <file> and --source latest
     while [ $# -gt 0 ]; do
         case "$1" in
             --apk) apk="${2:-}"; shift 2 ;;
             --apk=*) apk="${1#--apk=}"; shift ;;
             --source)
-                [ $# -gt 1 ] || { echo "ERRO: --source requer um valor" >&2; return 1; }
+                [ $# -gt 1 ] || { echo "ERROR: --source requires a value" >&2; return 1; }
                 shift
                 case "$1" in
                     latest) source_latest=1 ;;
-                    *) echo "ERRO: fonte desconhecida: $1 (use --source latest)" >&2; return 1 ;;
+                    *) echo "ERROR: unknown source: $1 (use --source latest)" >&2; return 1 ;;
                 esac
                 shift ;;
             --source=*)
                 case "${1#--source=}" in
                     latest) source_latest=1 ;;
-                    *) echo "ERRO: fonte desconhecida: ${1#--source=} (use --source latest)" >&2; return 1 ;;
+                    *) echo "ERROR: unknown source: ${1#--source=} (use --source latest)" >&2; return 1 ;;
                 esac
                 shift ;;
             *) shift ;;
         esac
     done
 
-    echo "Extraindo APK Shizuku para $dest ..."
+    echo "Extracting Shizuku APK to $dest ..."
     if [ -n "$apk" ]; then
-        # --apk vence sobre --source latest
-        [ -f "$apk" ] || { echo "ERRO: APK não encontrado: $apk" >&2; return 4; }
+        # --apk wins over --source latest
+        [ -f "$apk" ] || { echo "ERROR: APK not found: $apk" >&2; return 4; }
         st_extract_from_apk "$apk" "$dest" || return $?
     elif [ "$source_latest" -eq 1 ]; then
         local downloaded_apk
@@ -102,17 +102,17 @@ st_install() {
     elif command -v pm >/dev/null 2>&1; then
         st_extract_from_pm "$dest" || return $?
     else
-        echo "ERRO: nem pm, --apk nem --source latest disponíveis (exit 4)" >&2
+        echo "ERROR: neither pm, --apk nor --source latest available (exit 4)" >&2
         return 4
     fi
 
-    # Copia a árvore de libs/plugins para ST_ROOT para o CLI instalado sourcar dali.
+    # Copy the libs/plugins tree to ST_ROOT so the installed CLI sources from there.
     mkdir -p "$dest/lib" "$dest/plugins"
     cp "$SCRIPT_DIR/../lib/paths.sh" "$SCRIPT_DIR/../lib/extract-apk.sh" "$SCRIPT_DIR/../lib/doctor.sh" "$dest/lib/"
     cp "$SCRIPT_DIR/../plugins/"*.sh "$dest/plugins/"
     cp "$SCRIPT_DIR/../bin/rish.in" "$dest/rish.in"
 
-    # Lê backend escolhido (sui.sh gravou em $dest/backend). Default: shizuku.
+    # Read chosen backend (sui.sh wrote to $dest/backend). Default: shizuku.
     local loader dex_name
     if [ -f "$dest/backend" ] && [ "$(cat "$dest/backend")" = "sui" ]; then
         loader="rikka.sui.shell.Shell"
@@ -124,7 +124,7 @@ st_install() {
     dex="$(st_prefix_lib)/$dex_name"
     lib="$(st_lib_path)"
     app_id="$(st_app_id)"
-    [ -f "$dest/rish.in" ] || { echo "ERRO: rish.in não copiado" >&2; return 1; }
+    [ -f "$dest/rish.in" ] || { echo "ERROR: rish.in not copied" >&2; return 1; }
 
     sed -e "s|@APP_ID@|$app_id|g" \
         -e "s|@DEX@|$dex|g" \
@@ -133,7 +133,7 @@ st_install() {
         "$dest/rish.in" > "$dest/rish"
     chmod 755 "$dest/rish"
 
-    # $PREFIX/bin/rish = wrapper de 3 linhas que exec o real em lib/
+    # $PREFIX/bin/rish = 3-line wrapper that execs the real one in lib/
     bin_rish="$(st_bin_rish_path)"
     real_rish="$(st_rish_path)"
     mkdir -p "$(dirname "$bin_rish")"
@@ -143,15 +143,15 @@ exec "$real_rish" "\$@"
 WRAPPER
     chmod 755 "$bin_rish"
 
-    # $PREFIX/bin/shizuku e $PREFIX/bin/shk = cópia do CLI (dispatch por $0; sources de ST_ROOT).
+    # $PREFIX/bin/shizuku and $PREFIX/bin/shk = copy of the CLI (dispatch by $0; sources from ST_ROOT).
     cp "$SCRIPT_DIR/shizuku" "$(st_prefix)/bin/shizuku"
     chmod 755 "$(st_prefix)/bin/shizuku"
     cp "$SCRIPT_DIR/shizuku" "$(st_prefix)/bin/shk"
     chmod 755 "$(st_prefix)/bin/shk"
 
-    echo "OK: instalado. rish em $bin_rish (exec $real_rish)"
-    echo "OK: árvore em $dest (lib/ plugins/)"
-    echo "OK: CLI em $(st_prefix)/bin/shizuku e $(st_prefix)/bin/shk"
+    echo "OK: installed. rish at $bin_rish (execs $real_rish)"
+    echo "OK: tree at $dest (lib/ plugins/)"
+    echo "OK: CLI at $(st_prefix)/bin/shizuku and $(st_prefix)/bin/shk"
     return 0
 }
 
@@ -163,15 +163,15 @@ st_rish() {
     local rish dex
     rish="$(st_rish_path)"
     dex="$(st_dex_path)"
-    [ -f "$rish" ] && [ -f "$dex" ] || { echo "ERRO: launcher/DEX ausente (exit 6)" >&2; return 6; }
-    [ -w "$dex" ] && { echo "ERRO: DEX gravável (exit 3)" >&2; return 3; }
+    [ -f "$rish" ] && [ -f "$dex" ] || { echo "ERROR: launcher/DEX missing (exit 6)" >&2; return 6; }
+    [ -w "$dex" ] && { echo "ERROR: DEX writable (exit 3)" >&2; return 3; }
     "$rish" "$@"
 }
 
-st_info() { st_rish -c 'pm list packages moe.shizuku.privileged.api' 2>/dev/null || echo "Shizuku não respondeu"; }
-st_open() { am start moe.shizuku.privileged.api/.MainActivity 2>/dev/null || echo "Não foi possível abrir via am"; }
+st_info() { st_rish -c 'pm list packages moe.shizuku.privileged.api' 2>/dev/null || echo "Shizuku did not respond"; }
+st_open() { am start moe.shizuku.privileged.api/.MainActivity 2>/dev/null || echo "Could not open via am"; }
 st_stop() { am force-stop moe.shizuku.privileged.api 2>/dev/null || true; }
-st_exec() { [ $# -gt 0 ] || { echo "ERRO: exec requer um comando" >&2; return 1; }; st_rish -c "$*"; }
+st_exec() { [ $# -gt 0 ] || { echo "ERROR: exec requires a command" >&2; return 1; }; st_rish -c "$*"; }
 st_shell() { st_rish -c sh; }
 
 st_uninstall() {
@@ -182,7 +182,7 @@ st_uninstall() {
     rm -rf "$dest/lib" "$dest/plugins" "$dest/rish.in" 2>/dev/null || true
     rm -f "$dest/rish" "$dest/rish_shizuku.dex" "$dest/rish_sui.dex" "$dest/librish.so" "$dest/backend" \
           "$bin_rish" "$prefix/bin/shizuku" "$prefix/bin/shk" 2>/dev/null || true
-    echo "OK: removido launcher/dex/árvore/symlink (sem tinyurl)"
+    echo "OK: removed launcher/dex/tree/symlink (no tinyurl)"
     return 0
 }
 
@@ -191,7 +191,7 @@ main() {
     [ -n "$cmd" ] || { st_usage; return 1; }
     shift || true
 
-    # Se chamado como rish, passa direto para o launcher. shk é alias do CLI.
+    # If called as rish, pass straight to the launcher. shk is an alias of the CLI.
     case "$(basename "$0")" in
         rish) st_rish "$cmd" "$@"; return $? ;;
     esac
@@ -217,7 +217,7 @@ main() {
         wait)       st_wait "$@" ;;
         aliases)   st_plugin_aliases "$@" ;;
         help|--help|-h) st_usage ;;
-        *)         echo "ERRO: verbo desconhecido: $cmd" >&2; st_usage; return 1 ;;
+        *)         echo "ERROR: unknown verb: $cmd" >&2; st_usage; return 1 ;;
     esac
 }
 

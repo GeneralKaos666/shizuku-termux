@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# plugin adb-connect — debug sem fio em 127.0.0.1, sem tcpip.
-# Companheiro do wireless.sh (que recusa 127.0.0.1 e foca LAN).
-# Não copia scripts do QuickShell; reimplementado.
+# plugin adb-connect — wireless debugging on 127.0.0.1, without tcpip.
+# Companion of wireless.sh (which rejects 127.0.0.1 and focuses on LAN).
+# Does not copy QuickShell scripts; reimplemented.
 
 CONNECT_HOST="127.0.0.1"
 
@@ -10,53 +10,53 @@ st_plugin_adb_connect() {
 
     case "$mode" in
         pair)
-            local porta="$2" codigo="$3"
-            [ -n "$porta" ] && [ -n "$codigo" ] || { echo "ERRO: uso: adb-connect pair <porta> <codigo>" >&2; return 1; }
-            is_port "$porta" || { echo "ERRO: porta invalida: $porta" >&2; return 1; }
-            st_adb_bin >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
-            echo "Emparelhando wireless: $CONNECT_HOST:$porta"
-            st_adb pair "$CONNECT_HOST:$porta" "$codigo" || return $?
-            echo "OK: emparelhado em $CONNECT_HOST:$porta"
+            local port="$2" code="$3"
+            [ -n "$port" ] && [ -n "$code" ] || { echo "ERROR: usage: adb-connect pair <port> <code>" >&2; return 1; }
+            is_port "$port" || { echo "ERROR: invalid port: $port" >&2; return 1; }
+            st_adb_bin >/dev/null 2>&1 || { echo "ERROR: adb not found" >&2; return 1; }
+            echo "Pairing wireless: $CONNECT_HOST:$port"
+            st_adb pair "$CONNECT_HOST:$port" "$code" || return $?
+            echo "OK: paired at $CONNECT_HOST:$port"
             return 0
             ;;
         status)
-            st_adb_bin >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
-            echo "Dispositivos ADB:"
+            st_adb_bin >/dev/null 2>&1 || { echo "ERROR: adb not found" >&2; return 1; }
+            echo "ADB devices:"
             st_adb devices
             return 0
             ;;
         disconnect)
-            local porta="${2:-5555}"
-            is_port "$porta" || { echo "ERRO: porta invalida: $porta" >&2; return 1; }
-            st_adb_bin >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
-            echo "Desconectando: $CONNECT_HOST:$porta"
-            st_adb disconnect "$CONNECT_HOST:$porta" || return $?
-            echo "OK: desconectado"
+            local port="${2:-5555}"
+            is_port "$port" || { echo "ERROR: invalid port: $port" >&2; return 1; }
+            st_adb_bin >/dev/null 2>&1 || { echo "ERROR: adb not found" >&2; return 1; }
+            echo "Disconnecting: $CONNECT_HOST:$port"
+            st_adb disconnect "$CONNECT_HOST:$port" || return $?
+            echo "OK: disconnected"
             return 0
             ;;
         wf)
-            echo "Abrindo configuracao de debug sem fio (Wireless Debugging) via rish ..."
+            echo "Opening wireless debugging settings via rish ..."
             if st_rish -c 'am start -a android.settings.APPLICATION_DEVELOPMENT_SETTINGS --es ":settings:fragment_args_key" toggle_adb_wireless' >/dev/null 2>&1; then
-                echo "OK: pagina de debug sem fio aberta via rish"
+                echo "OK: wireless debugging page opened via rish"
                 return 0
             fi
             if st_rish -c 'am start -a android.settings.DEVELOPMENT_SETTINGS' >/dev/null 2>&1; then
-                echo "OK: pagina de desenvolvedor aberta via rish"
+                echo "OK: developer options page opened via rish"
                 return 0
             fi
-            echo "ERRO: nao foi possível abrir configuracao de desenvolvedor via rish" >&2
+            echo "ERROR: could not open developer options via rish" >&2
             return 1
             ;;
         ""|*)
-            local porta="$mode"
-            [ -n "$porta" ] || { echo "ERRO: uso: adb-connect <porta> | pair <porta> <codigo> | status | disconnect [porta] | wf" >&2; return 1; }
-            is_port "$porta" || { echo "ERRO: porta invalida: $porta" >&2; return 1; }
-            st_adb_bin >/dev/null 2>&1 || { echo "ERRO: adb nao encontrado" >&2; return 1; }
-            echo "Conectando debug sem fio: $CONNECT_HOST:$porta"
+            local port="$mode"
+            [ -n "$port" ] || { echo "ERROR: usage: adb-connect <port> | pair <port> <code> | status | disconnect [port] | wf" >&2; return 1; }
+            is_port "$port" || { echo "ERROR: invalid port: $port" >&2; return 1; }
+            st_adb_bin >/dev/null 2>&1 || { echo "ERROR: adb not found" >&2; return 1; }
+            echo "Connecting wireless debugging: $CONNECT_HOST:$port"
             st_adb start-server >/dev/null 2>&1 || true
-            st_adb connect "$CONNECT_HOST:$porta" || return $?
-            st_adb -s "$CONNECT_HOST:$porta" wait-for-device >/dev/null 2>&1 || return $?
-            echo "OK: conectado em $CONNECT_HOST:$porta"
+            st_adb connect "$CONNECT_HOST:$port" || return $?
+            st_adb -s "$CONNECT_HOST:$port" wait-for-device >/dev/null 2>&1 || return $?
+            echo "OK: connected at $CONNECT_HOST:$port"
             return 0
             ;;
     esac

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Teste: rish gerado de rish.in não tem PKG, tem ShizukuShellLoader e check de DEX gravável→exit 3.
+# Test: rish generated from rish.in has no PKG, has ShizukuShellLoader and a writable-DEX check→exit 3.
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -9,65 +9,65 @@ export PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
 PASS=0; FAIL=0
 
-[ -f "$SRC" ] || { echo "FALHA: rish.in não encontrado"; exit 1; }
+[ -f "$SRC" ] || { echo "FAIL: rish.in not found"; exit 1; }
 
-# Gera substitui placeholders
+# Generate: substitute placeholders
 sed -e 's/@APP_ID@/com.termux/g' \
     -e "s|@DEX@|$PREFIX/lib/shizuku-termux/rish_shizuku.dex|g" \
     -e 's|@LIB@||g' \
     -e 's|@LOADER@|rikka.shizuku.shell.ShizukuShellLoader|g' \
     "$SRC" > "$GEN"
 
-echo "--- teste: placeholder @APP_ID@ substituído (não fica PKG) ---"
+echo "--- test: placeholder @APP_ID@ substituted (no PKG left) ---"
 if grep -q '@APP_ID@' "$GEN"; then
-    echo "FALHA: placeholder @APP_ID@ não substituído"; FAIL=$((FAIL+1))
+    echo "FAIL: placeholder @APP_ID@ not substituted"; FAIL=$((FAIL+1))
 elif grep -q 'APP_ID="PKG"' "$GEN"; then
-    echo "FALHA: APP_ID ficou como PKG literal"; FAIL=$((FAIL+1))
+    echo "FAIL: APP_ID stayed as literal PKG"; FAIL=$((FAIL+1))
 else
-    echo "OK: APP_ID resolvido (sem PKG placeholder)"
+    echo "OK: APP_ID resolved (no PKG placeholder)"
 fi
 
-echo "--- teste: contém com.termux como app id ---"
+echo "--- test: contains com.termux as app id ---"
 if grep -q 'com.termux' "$GEN"; then
-    echo "OK: contém com.termux"
+    echo "OK: contains com.termux"
 else
-    echo "FALHA: sem com.termux"; FAIL=$((FAIL+1))
+    echo "FAIL: no com.termux"; FAIL=$((FAIL+1))
 fi
 
-echo "--- teste: contém classe FQCN rikka.shizuku.shell.ShizukuShellLoader ---"
+echo "--- test: contains FQCN class rikka.shizuku.shell.ShizukuShellLoader ---"
 if grep -Fq 'rikka.shizuku.shell.ShizukuShellLoader' "$GEN"; then
-    echo "OK: classe FQCN Rikka presente"
+    echo "OK: Rikka FQCN class present"
 else
-    echo "FALHA: sem rikka.shizuku.shell.ShizukuShellLoader"; FAIL=$((FAIL+1))
+    echo "FAIL: no rikka.shizuku.shell.ShizukuShellLoader"; FAIL=$((FAIL+1))
 fi
 
-echo "--- teste: recusa libsu (topjohnwu) ---"
+echo "--- test: refuses libsu (topjohnwu) ---"
 if grep -Fq 'com.topjohnwu' "$GEN"; then
-    echo "FALHA: contém classe libsu (topjohnwu)"; FAIL=$((FAIL+1))
+    echo "FAIL: contains libsu class (topjohnwu)"; FAIL=$((FAIL+1))
 else
-    echo "OK: sem libsu (topjohnwu)"
+    echo "OK: no libsu (topjohnwu)"
 fi
 
-echo "--- teste: contém -Djava.class.path= (DEX injetado) ---"
+echo "--- test: contains -Djava.class.path= (DEX injected) ---"
 if grep -F -- '-Djava.class.path=' "$GEN"; then
-    echo "OK: contém -Djava.class.path="
+    echo "OK: contains -Djava.class.path="
 else
-    echo "FALHA: sem -Djava.class.path="; FAIL=$((FAIL+1))
+    echo "FAIL: no -Djava.class.path="; FAIL=$((FAIL+1))
 fi
 
-echo "--- teste: contém app_process /system/bin ---"
+echo "--- test: contains app_process /system/bin ---"
 if grep -q '/system/bin/app_process' "$GEN"; then
-    echo "OK: contém app_process /system/bin"
+    echo "OK: contains app_process /system/bin"
 else
-    echo "FALHA: sem app_process /system/bin"; FAIL=$((FAIL+1))
+    echo "FAIL: no app_process /system/bin"; FAIL=$((FAIL+1))
 fi
 
-echo "--- teste: contém check de DEX gravável → exit 3 ---"
+echo "--- test: contains writable-DEX check → exit 3 ---"
 if grep -q 'exit 3' "$GEN"; then
-    echo "OK: contém exit 3"
+    echo "OK: contains exit 3"
 else
-    echo "FALHA: sem exit 3"; FAIL=$((FAIL+1))
+    echo "FAIL: no exit 3"; FAIL=$((FAIL+1))
 fi
 
-if [ $FAIL -eq 0 ]; then echo "RESULTADO: TESTES rish-gen PASSARAM"; else echo "RESULTADO: $FAIL FALHA(S)"; fi
+if [ $FAIL -eq 0 ]; then echo "RESULT: rish-gen tests PASSED"; else echo "RESULT: $FAIL FAILURE(S)"; fi
 exit $FAIL

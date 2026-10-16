@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# build-deb.sh — gera .deb do shizuku-termux (ZERO .dex/.so/.apk).
-# O .deb contém scripts + man + postinst que lembra `shizuku install`.
+# build-deb.sh — builds the shizuku-termux .deb (ZERO .dex/.so/.apk).
+# The .deb contains scripts + man + postinst that reminds you to run `shizuku install`.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -18,80 +18,80 @@ mkdir -p "$DEBIAN" "$DEB_DIR/usr/bin" "$DEB_DIR/usr/lib/shizuku-termux/lib" \
 cp "$SCRIPT_DIR/DEBIAN/control" "$DEBIAN/control"
 chmod 644 "$DEBIAN/control"
 
-# ── postinst: lembra rodar `shizuku install` no device ─────────
+# ── postinst: reminds you to run `shizuku install` on the device ─
 cat > "$DEBIAN/postinst" <<'POSTINST'
 #!/bin/sh
 set -e
-echo "shizuku-termux instalado."
-echo "No device Termux, rode:  shizuku install --apk <caminho-do-apk-shizuku>"
-echo "Depois:                  shizuku doctor"
+echo "shizuku-termux installed."
+echo "On the Termux device, run:  shizuku install --apk <path-to-shizuku-apk>"
+echo "Then:                       shizuku doctor"
 exit 0
 POSTINST
 chmod 755 "$DEBIAN/postinst"
 
-# ── binários/scripts ────────────────────────────────────────────
+# ── binaries/scripts ────────────────────────────────────────────
 cp "$SCRIPT_DIR/../bin/shizuku" "$DEB_DIR/usr/bin/shizuku"
 cp "$SCRIPT_DIR/../bin/shk"     "$DEB_DIR/usr/bin/shk"
 chmod 755 "$DEB_DIR/usr/bin/shizuku" "$DEB_DIR/usr/bin/shk"
 
-# rish.in (template; o rish real é gerado no device por `shizuku install`)
+# rish.in (template; the real rish is generated on the device by `shizuku install`)
 cp "$SCRIPT_DIR/../bin/rish.in" "$DEB_DIR/usr/lib/shizuku-termux/rish.in"
 chmod 644 "$DEB_DIR/usr/lib/shizuku-termux/rish.in"
 
-# libs (sem .dex/.so — só os fontes de shell)
+# libs (no .dex/.so — shell sources only)
 cp "$SCRIPT_DIR/../lib/paths.sh" "$DEB_DIR/usr/lib/shizuku-termux/lib/"
 cp "$SCRIPT_DIR/../lib/extract-apk.sh" "$DEB_DIR/usr/lib/shizuku-termux/lib/"
 cp "$SCRIPT_DIR/../lib/doctor.sh" "$DEB_DIR/usr/lib/shizuku-termux/lib/"
 chmod 644 "$DEB_DIR/usr/lib/shizuku-termux/lib/"*.sh
 
-# plugins de ponte (sem .dex/.so)
+# bridge plugins (no .dex/.so)
 cp "$SCRIPT_DIR/../plugins/"*.sh "$DEB_DIR/usr/lib/shizuku-termux/plugins/"
 chmod 644 "$DEB_DIR/usr/lib/shizuku-termux/plugins/"*.sh
 
 # ── man page ────────────────────────────────────────────────────
 cat > "$DEB_DIR/usr/share/man/man1/shizuku.1" <<'MAN'
 .SH NAME
-shizuku \- ponte Termux<->Shizuku (núcleo único)
+shizuku \- Termux<->Shizuku bridge (single core)
 
 .SH SYNOPSIS
-shizuku <verbo> [args]
+shizuku <verb> [args]
 
 .SH DESCRIPTION
-Instala, valida e usa Shizuku/rish no Termux dentro do protocolo
-oficial da Rikka. O pacote .deb NÃO contém .dex/.so/.apk;
-a extração do DEX acontece no device via \`shizuku install\`.
+Installs, validates and uses Shizuku/rish in Termux within the official
+Rikka protocol. The .deb package does NOT contain .dex/.so/.apk;
+the DEX extraction happens on the device via \`shizuku install\`.
 
-.SH VERBOS
-install      Extrai APK Shizuku → $PREFIX/lib/shizuku-termux/
-doctor       Checa saúde do núcleo
-rish <args>  Passa args ao launcher rish remoto
+.SH VERBS
+install      Extracts Shizuku APK → $PREFIX/lib/shizuku-termux/
+doctor       Checks core health
+rish <args>  Passes args to the remote rish launcher
 info|open|stop|exec|shell|version
-             Operações do Shizuku
-uninstall    Remove launcher/dex/symlink
+             Shizuku operations
+uninstall    Removes launcher/dex/symlink
 sui          \--backend shizuku|sui
-wireless     adb pair/connect IP:porta + código
+wireless     adb pair/connect IP:port + code
 usb-loopback adb tcpip 5555 + connect 127.0.0.1:5555
 keepalive    Heartbeat (start|stop|status)
-pm-install   pm install via rish só se uid 2000
-start-daemon start.sh oficial via adb
-aliases      spm/sam opcionais
+pm-install   pm install via rish only if uid 2000
+start-daemon Official start.sh via adb
+aliases      Optional spm/sam
 
-.SH "NAO FAÇA"
-tinyurl, curl | bash, gist, .dex/.so no git, chmod +w no DEX,
+.SH "DO NOT"
+tinyurl, curl | bash, gist, .dex/.so in git, chmod +w on the DEX,
 pkg install shizuku, PKG placeholder.
 
 MAN
 gzip -9 "$DEB_DIR/usr/share/man/man1/shizuku.1"
 
-# ── gerar .deb ──────────────────────────────────────────────────
+# ── build the .deb ──────────────────────────────────────────────
 DEB_OUT="/tmp/shizuku-termux-1.0.0.deb"
 if command -v dpkg-deb >/dev/null 2>&1; then
     dpkg-deb --root-owner-group -b "$DEB_DIR" "$DEB_OUT"
-    echo "OK: .deb gerado em $DEB_OUT"
+    echo "OK: .deb generated at $DEB_OUT"
     echo "---"
     dpkg-deb --info "$DEB_OUT"
 else
-    echo "AVISO: dpkg-deb não encontrado; .deb não gerado."
-    echo "Estrutura pronta em: $DEB_DIR"
+    echo "WARNING: dpkg-deb not found; .deb not generated."
+    echo "Structure ready at: $DEB_DIR"
     exit 0
 fi

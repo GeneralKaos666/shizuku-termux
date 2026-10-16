@@ -1,29 +1,29 @@
 #!/system/bin/sh
-# rish.in — template do launcher Shizuku (gerado do asset Rikka).
-# Placeholders substituídos no generate:
-#   @APP_ID@  → RISH_APPLICATION_ID ($TERMUX_APP__PACKAGE_NAME ou com.termux)
-#   @DEX@     → caminho absoluto do rish_shizuku.dex
-#   @LIB@     → caminho absoluto do librish.so (ou vazio)
+# rish.in — Shizuku launcher template (generated from the Rikka asset).
+# Placeholders substituted at generate time:
+#   @APP_ID@  → RISH_APPLICATION_ID ($TERMUX_APP__PACKAGE_NAME or com.termux)
+#   @DEX@     → absolute path of rish_shizuku.dex
+#   @LIB@     → absolute path of librish.so (or empty)
 
 APP_ID="@APP_ID@"
 DEX="@DEX@"
 LIB="@LIB@"
 LOADER="@LOADER@"
 
-# Nunca deixar PKG vivo.
+# Never leave PKG alive.
 if [ "$APP_ID" = "PKG" ] || [ -z "$APP_ID" ]; then
     APP_ID="com.termux"
 fi
 export RISH_APPLICATION_ID="$APP_ID"
 
-# SDK >= 34: DEX deve ser non-writable. Se gravável → exit 3.
+# SDK >= 34: DEX must be non-writable. If writable → exit 3.
 if [ -w "$DEX" ]; then
-    echo "ERRO: DEX gravável ($DEX) — app_process aborta no A14" >&2
+    echo "ERROR: DEX writable ($DEX) — app_process aborts on A14" >&2
     exit 3
 fi
 
 if [ ! -f "$DEX" ]; then
-    echo "ERRO: DEX ausente: $DEX" >&2
+    echo "ERROR: DEX missing: $DEX" >&2
     exit 6
 fi
 

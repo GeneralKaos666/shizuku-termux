@@ -3,6 +3,7 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TMP="${TMPDIR:-/tmp}"
 . "$SCRIPT_DIR/../src/lib/paths.sh"
 
 # The source above inherits 'set -euo pipefail' from extract-apk.sh; we disable it to manage PASS/FAIL manually.
@@ -11,9 +12,14 @@ set +u
 
 PASS=0; FAIL=0
 
+# Sandbox HOME/PREFIX so a real ~/.local/bin/adb or $PREFIX/bin/termux-adb on the
+# host cannot short-circuit the "adb not found" path exercised below.
+empty_home="$(mktemp -d)"
+empty_prefix="$(mktemp -d)"
+
 echo "--- test 1: ST_ADB pointing to a nonexistent stub → st_adb_bin fails ---"
 tmpbin0="$(mktemp -d)"
-ST_ADB="/tmp/does-not-exist-adb" PATH="$tmpbin0" st_adb_bin >/tmp/stadb1.out 2>&1 || rc=$?
+ST_ADB="$TMP/does-not-exist-adb" HOME="$empty_home" PREFIX="$empty_prefix" PATH="$tmpbin0" st_adb_bin >"$TMP"/stadb1.out 2>&1 || rc=$?
 rc=${rc:-0}
 [ "$rc" = "1" ] && { echo "OK: st_adb_bin returns 1 without a valid ST_ADB"; PASS=$((PASS+1)); } || { echo "FAIL: expected 1, got ${rc:-}"; FAIL=$((FAIL+1)); }
 rm -rf "$tmpbin0"
@@ -32,9 +38,10 @@ rm -rf "$tmpbin"
 echo "--- test 3: no ST_ADB and no adb on PATH → message contains github.com/rianprei/termux-adb ---"
 # Create an empty PATH without adb
 tmpbin2="$(mktemp -d)"
-out="$(PATH="$tmpbin2" st_adb_bin 2>&1)" || rc=$?
+out="$(PATH="$tmpbin2" HOME="$empty_home" PREFIX="$empty_prefix" st_adb_bin 2>&1)" || rc=$?
 echo "$out" | grep -q "github.com/rianprei/termux-adb" && { echo "OK: message mentions github.com/rianprei/termux-adb"; PASS=$((PASS+1)); } || { echo "FAIL: output=$out rc=$rc"; FAIL=$((FAIL+1)); }
 rm -rf "$tmpbin2"
+rm -rf "$empty_home" "$empty_prefix"
 
 if [ $FAIL -eq 0 ]; then echo "RESULT: st-adb tests PASSED"; else echo "RESULT: $FAIL FAILURE(S)"; fi
 exit $FAIL

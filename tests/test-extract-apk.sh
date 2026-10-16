@@ -3,13 +3,14 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TMP="${TMPDIR:-/tmp}"
 . "$SCRIPT_DIR/../src/lib/paths.sh"
 . "$SCRIPT_DIR/../src/lib/extract-apk.sh"
 
 PASS=0; FAIL=0
 
 # Create a zip fixture with assets/rish and assets/rish_shizuku.dex
-FIXTURE="/tmp/shizuku_fixture.zip"
+FIXTURE="$TMP/shizuku_fixture.zip"
 rm -f "$FIXTURE"
 tmpd="$(mktemp -d)"
 mkdir -p "$tmpd/assets"
@@ -41,7 +42,7 @@ dex_mode="$(stat -c '%a' "$DEST/rish_shizuku.dex" 2>/dev/null || stat -f '%Lp' "
 [ "$dex_mode" = "400" ] || { echo "FAIL: dex mode=$dex_mode (expected 400)"; FAIL=$((FAIL+1)); }
 
 echo "--- test: refuses APK without assets ---"
-badzip="/tmp/bad.zip"
+badzip="$TMP/bad.zip"
 echo 'not an apk' > "$badzip"
 if st_extract_from_apk "$badzip" "$DEST" 2>/dev/null; then
     echo "FAIL: should have refused an invalid APK"; FAIL=$((FAIL+1))
@@ -50,7 +51,7 @@ else
 fi
 
 echo "--- test: refuses a missing APK ---"
-if st_extract_from_apk "/tmp/does-not-exist.apk" "$DEST" 2>/dev/null; then
+if st_extract_from_apk "$TMP/does-not-exist.apk" "$DEST" 2>/dev/null; then
     echo "FAIL: should have refused a missing APK"; FAIL=$((FAIL+1))
 else
     echo "OK: missing APK refused"

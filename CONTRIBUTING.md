@@ -5,10 +5,10 @@
 Run the full suite before opening a PR:
 
 ```bash
-bash tests/test-*.sh
+bash tests/run-all.sh
 ```
 
-All tests must pass (exit 0). The tests run on the host, without a device and without a real adb network.
+All tests must pass (exit 0). The tests run on the host, without a device and without a real adb network. Temporary files use `${TMPDIR:-/tmp}`, so on Termux set `TMPDIR="$PREFIX/tmp"` (or any writable directory) if `/tmp` is not writable.
 
 ## Pull request rules
 

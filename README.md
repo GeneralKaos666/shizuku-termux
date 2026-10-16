@@ -96,7 +96,7 @@ Own code under the [MIT License](LICENSE). Ideas originating from the community 
 The tests run on the host (no device):
 
 ```bash
-bash tests/test-*.sh
+bash tests/run-all.sh
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for pull request rules.

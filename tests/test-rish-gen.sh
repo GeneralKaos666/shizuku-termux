@@ -3,8 +3,9 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TMP="${TMPDIR:-/tmp}"
 SRC="$SCRIPT_DIR/../src/bin/rish.in"
-GEN="/tmp/rish_generated.sh"
+GEN="$TMP/rish_generated.sh"
 export PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
 PASS=0; FAIL=0

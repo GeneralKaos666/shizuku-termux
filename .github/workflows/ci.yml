@@ -16,5 +16,4 @@ jobs:
           sudo apt-get install -y unzip bash coreutils findutils
 
       - name: Run host test suite
-        run: |
-          bash tests/test-*.sh
+        run: bash tests/run-all.sh

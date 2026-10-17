@@ -1,3 +1,10 @@
+---
+status: andamento
+fonte: 
+created: 2026-10-16
+updated: 2026-10-16
+title: ATTRIBUTION
+---
 # Attribution — ideias de origem (não copiamos código GPL)
 
 Este núcleo funde capacidades únicas de wrappers comunitários, reimplementando
@@ -23,6 +30,7 @@ o que necessário. Nenhum arquivo GPL foi copiado. Lista de atribuição:
 |-------|-------------------|------|
 | crowforkotlin/quick-shell | `--source latest` (download APK oficial via GitHub API) + fallback `libshizuku.so --apk=` para start do daemon; `adb-connect` (debug sem fio em 127.0.0.1 sem tcpip) + `wf` (abre Wireless Debugging) | `src/lib/extract-apk.sh` (`st_download_official_apk`), `src/plugins/start-daemon.sh`, `src/plugins/adb-connect.sh` |
 | auto-brevent (ideia) | `wait`: poll `rish -c true` até Shizuku responder | `src/lib/doctor.sh` (`st_wait`) |
+| GeneralKaos666/shizuku-termux | `tests/run-all.sh`, CI da suíte inteira, `${TMPDIR:-/tmp}`, `umask 022` no build-deb | reimplementado; tradução EN recusada |
 | rianprei/termux-adb | front-end `adb` unificado (OTG + nativo); resolução do binário via `st_adb` | `src/lib/paths.sh` (`st_adb_bin`, `st_adb`); código não copiado |
 
 ## Veneno recusado (não entra no núcleo)

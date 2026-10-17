@@ -3,6 +3,7 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TMP="${TMPDIR:-/tmp}"
 . "$SCRIPT_DIR/../src/lib/paths.sh"
 . "$SCRIPT_DIR/../src/lib/doctor.sh"
 
@@ -13,7 +14,7 @@ PASS=0; FAIL=0
 
 echo "--- teste 1: st_wait 0 com rish ausente -> return 2 (rapido) ---"
 inicio=$(date +%s)
-st_wait 0 >/tmp/wait1.out 2>&1 || rc=$?
+st_wait 0 >"$TMP/wait1.out" 2>&1 || rc=$?
 fim=$(date +%s)
 dur=$((fim - inicio))
 [ "$rc" = "2" ] && { echo "OK: return 2 (Shizuku down)"; PASS=$((PASS+1)); } || { echo "FALHA: esperado 2, obteve ${rc:-}"; FAIL=$((FAIL+1)); }
@@ -27,7 +28,7 @@ exit 0
 RISH
 chmod 755 "$tmpbin/rish"
 rc=0
-PATH="$tmpbin:$PATH" st_wait 0 >/tmp/wait2.out 2>&1 || rc=$?
+PATH="$tmpbin:$PATH" st_wait 0 >"$TMP/wait2.out" 2>&1 || rc=$?
 [ "$rc" = "0" ] && { echo "OK: return 0 (Shizuku respondeu)"; PASS=$((PASS+1)); } || { echo "FALHA: esperado 0, obteve ${rc:-}"; FAIL=$((FAIL+1)); }
 rm -rf "$tmpbin"
 

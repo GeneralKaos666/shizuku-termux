@@ -1,3 +1,10 @@
+---
+status: andamento
+fonte: 
+created: 2026-10-16
+updated: 2026-10-16
+title: README
+---
 # shizuku-termux
 
 Único CLI (`shizuku` / `shk` / `rish`) que instala, valida e usa o Shizuku/`rish` no Termux dentro do protocolo oficial da Rikka, fundindo as capacidades únicas dos wrappers comunitários e recusando supply-chain podre.
@@ -85,7 +92,7 @@ Os verbos `wireless`, `usb-loopback`, `adb-connect` e `start-daemon` resolvem o 
 3. `command -v adb` (PATH).
 4. `$PREFIX/bin/termux-adb` (último recurso, patchado OTG).
 
-Nenhum instalador ou binário do termux-adb é vendindo neste repositório.
+Nenhum instalador ou binário do termux-adb é vendido neste repositório.
 
 ## Licença e atribuição
 
@@ -96,7 +103,7 @@ Código próprio sob [MIT License](LICENSE). Ideias de origem dos wrappers comun
 Os testes rodam no host (sem device):
 
 ```bash
-bash tests/test-*.sh
+bash tests/run-all.sh
 ```
 
 Veja [CONTRIBUTING.md](CONTRIBUTING.md) para regras de pull request.

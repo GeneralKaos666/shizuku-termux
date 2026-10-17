@@ -3,6 +3,9 @@
 # O .deb contém scripts + man + postinst que lembra `shizuku install`.
 set -euo pipefail
 
+# dpkg-deb recusa control 700; man gzipado precisa world-readable.
+umask 022
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 WORK="$(mktemp -d)"
@@ -84,7 +87,7 @@ MAN
 gzip -9 "$DEB_DIR/usr/share/man/man1/shizuku.1"
 
 # ── gerar .deb ──────────────────────────────────────────────────
-DEB_OUT="/tmp/shizuku-termux-1.0.0.deb"
+DEB_OUT="${TMPDIR:-/tmp}/shizuku-termux-1.0.0.deb"
 if command -v dpkg-deb >/dev/null 2>&1; then
     dpkg-deb --root-owner-group -b "$DEB_DIR" "$DEB_OUT"
     echo "OK: .deb gerado em $DEB_OUT"

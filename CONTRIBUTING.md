@@ -1,3 +1,10 @@
+---
+status: andamento
+fonte: 
+created: 2026-10-16
+updated: 2026-10-16
+title: CONTRIBUTING
+---
 # Contributing
 
 ## Testes host
@@ -5,10 +12,10 @@
 Execute a suíte completa antes de abrir um PR:
 
 ```bash
-bash tests/test-*.sh
+bash tests/run-all.sh
 ```
 
-Todos os testes devem passar (exit 0). Os testes rodam no host, sem device e sem rede real para adb.
+Todos os testes devem passar (exit 0). Os testes rodam no host, sem device e sem rede real para adb. Temporários usam `${TMPDIR:-/tmp}`; no Termux, `TMPDIR="$PREFIX/tmp"` se `/tmp` não for gravável.
 
 ## Regras de pull request
 

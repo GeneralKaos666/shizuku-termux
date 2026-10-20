@@ -1,10 +1,3 @@
----
-status: andamento
-fonte: 
-created: 2026-10-16
-updated: 2026-10-16
-title: README
----
 # shizuku-termux
 
 Único CLI (`shizuku` / `shk` / `rish`) que instala, valida e usa o Shizuku/`rish` no Termux dentro do protocolo oficial da Rikka, fundindo as capacidades únicas dos wrappers comunitários e recusando supply-chain podre.

@@ -1,10 +1,3 @@
----
-status: andamento
-fonte: 
-created: 2026-10-16
-updated: 2026-10-16
-title: ATTRIBUTION
----
 # Attribution — ideias de origem (não copiamos código GPL)
 
 Este núcleo funde capacidades únicas de wrappers comunitários, reimplementando

@@ -66,16 +66,6 @@ $PREFIX/bin/shizuku  cópia do CLI (dispatch por $0)
 $PREFIX/bin/shk      cópia do CLI (dispatch por $0)
 ```
 
-## O que não entra (veneno recusado)
-
-- `tinyurl`, `curl … | bash`, `gist … | bash`
-- DEX / `.so` commitados no git
-- `chmod +w` / `+rwx` no DEX
-- `releases/latest/download/rish` / fake releases
-- `pkg install shizuku`
-- `PKG` placeholder vivo
-- Arquivo GPL do rish4termux (o switch é reimplementado, não copiado)
-
 ## Companheiro: termux-adb
 
 Os verbos `wireless`, `usb-loopback`, `adb-connect` e `start-daemon` resolvem o binário `adb` através de `st_adb` (definido em `src/lib/paths.sh`). A ordem de resolução é:

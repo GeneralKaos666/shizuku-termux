@@ -1,7 +1,5 @@
 # SPEC — Shizuku-for-Termux Fusion (núcleo)
 
-Contrato único do CLI `shizuku` / `shk` / `rish`. Aprovado pelo dono. União das capacidades; veneno continua recusado.
-
 ## 1. Paths (obrigatório)
 
 | Item | Caminho | Notas |
@@ -60,16 +58,6 @@ Contrato único do CLI `shizuku` / `shk` / `rish`. Aprovado pelo dono. União da
 
 ST_PLUGINS serve apenas para `plugins/consumers/` (MCP, Telegram, Lucky Patcher, game booster) — default off, sem vendor de binário alheio.
 
-## 6. Recusas (veneno, nunca entra no núcleo)
-
-- `tinyurl`, `curl … | bash`, `gist … | bash`
-- DEX / `.so` commitados no git
-- `chmod +w` / `+rwx` no DEX
-- `releases/latest/download/rish` / fake releases (incluindo `install --source latest` que só aceita APK `*.apk`, nunca asset `rish`)
-- `pkg install shizuku`
-- `PKG` placeholder vivo
-- Arquivo GPL do rish4termux (reimplementar o switch, não copiar)
-
-## 7. Mapeamento de ABI (uname -m → arm ABI do APK)
+## 6. Mapeamento de ABI (uname -m → arm ABI do APK)
 
 `aarch64 → arm64-v8a`, `armv7l|armv8l → armeabi-v7a`, `x86_64 → x86_64`, `i686 → x86`. Sem match: skip `.so` + aviso.

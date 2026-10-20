@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# plugin sui — switch de backend shizuku|sui (reimplementado; default shizuku).
-# Grava a escolha em $ST_ROOT/backend; o generate do rish.in lê este arquivo.
-# Não copia arquivo GPL do rish4termux.
+# plugin sui — shizuku|sui backend switch (reimplemented; default shizuku).
+# Writes the choice to $ST_ROOT/backend; the rish.in generate reads this file.
+# Does not copy the GPL file from rish4termux.
 
 st_plugin_sui() {
     local backend=""
@@ -18,14 +18,14 @@ st_plugin_sui() {
     case "$backend" in
         sui)
             echo "sui" > "$backend_file"
-            echo "Backend: sui → DEX rish_sui.dex + loader rikka.sui.shell.Shell (reimplementado, sem GPL)"
+            echo "Backend: sui → DEX rish_sui.dex + loader rikka.sui.shell.Shell (reimplemented, no GPL)"
             ;;
         shizuku|"")
             echo "shizuku" > "$backend_file"
-            echo "Backend: shizuku (padrão) → loader rikka.shizuku.shell.ShizukuShellLoader"
+            echo "Backend: shizuku (default) → loader rikka.shizuku.shell.ShizukuShellLoader"
             ;;
         *)
-            echo "ERRO: backend desconhecido: $backend" >&2
+            echo "ERROR: unknown backend: $backend" >&2
             return 1
             ;;
     esac

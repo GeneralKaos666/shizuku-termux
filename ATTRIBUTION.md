@@ -1,35 +1,35 @@
-# Attribution — ideias de origem (não copiamos código GPL)
+# Attribution — ideas of origin (we do not copy GPL code)
 
-Este núcleo funde capacidades únicas de wrappers comunitários, reimplementando
-o que necessário. Nenhum arquivo GPL foi copiado. Lista de atribuição:
+This core fuses unique capabilities from community wrappers, reimplementing
+what is necessary. No GPL file was copied. Attribution list:
 
-| Fonte | O que foi aproveitado | Como entrou no núcleo |
-|-------|----------------------|----------------------|
-| RikkaApps/Shizuku | launcher `app_process` + `ShizukuShellLoader`, chmod 400, DEX ao lado do script | Reimplementado (asset oficial); classe FQCN `rikka.shizuku.shell.ShizukuShellLoader` |
-| merbah3266/rish_installer | unzip `assets/rish` + `assets/rish_shizuku.dex`, `install -m755`/`install -m400`, detect package id | `src/lib/extract-apk.sh` (reimplementado; tinyurl recusado) |
-| AlexeiCrystal/termux-shizuku-tools | verbos `info|open|stop|exec|shell|version|doctor|install|uninstall`, `.deb` sem dex/so, CLI `shizuku`/`shk` | `src/bin/shizuku`, `src/packaging/build-deb.sh` (binários não copiados) |
-| jecis-repos/termux-shizuku-tools | keepalive / phantom process, aliases `spm`/`sam` | `src/plugins/keepalive.sh` (loop heartbeat, reimplementado), `src/plugins/aliases.sh` |
-| orzgithub/rish4termux | switch `--shizuku`/`--sui` | `src/plugins/sui.sh` (reimplementado; arquivo GPL não copiado) |
-| hxse/termux-shizuku-bootstrap | wireless pair/connect (IP:porta + código) | `src/plugins/wireless.sh` (127.0.0.1 recusado; `curl|bash` recusado) |
+| Source | What was leveraged | How it entered the core |
+|--------|--------------------|-------------------------|
+| RikkaApps/Shizuku | `app_process` launcher + `ShizukuShellLoader`, chmod 400, DEX next to the script | Reimplemented (official asset); FQCN class `rikka.shizuku.shell.ShizukuShellLoader` |
+| merbah3266/rish_installer | unzip `assets/rish` + `assets/rish_shizuku.dex`, `install -m755`/`install -m400`, detect package id | `src/lib/extract-apk.sh` (reimplemented; tinyurl refused) |
+| AlexeiCrystal/termux-shizuku-tools | verbs `info|open|stop|exec|shell|version|doctor|install|uninstall`, `.deb` without dex/so, CLI `shizuku`/`shk` | `src/bin/shizuku`, `src/packaging/build-deb.sh` (binaries not copied) |
+| jecis-repos/termux-shizuku-tools | keepalive / phantom process, `spm`/`sam` aliases | `src/plugins/keepalive.sh` (heartbeat loop, reimplemented), `src/plugins/aliases.sh` |
+| orzgithub/rish4termux | `--shizuku`/`--sui` switch | `src/plugins/sui.sh` (reimplemented; GPL file not copied) |
+| hxse/termux-shizuku-bootstrap | wireless pair/connect (IP:port + code) | `src/plugins/wireless.sh` (127.0.0.1 refused; `curl|bash` refused) |
 | xvxv-stack7/termux-shizuku | usb-loopback `adb tcpip 5555` + `connect 127.0.0.1:5555` | `src/plugins/usb-loopback.sh` |
-| austinsager/adv-install | `pm install` só se uid 2000 | `src/plugins/pm-install.sh` (via `rish -c "pm install ..."`) |
-| ConzZah/csb | start daemon Shizuku via adb | `src/plugins/start-daemon.sh` (start.sh oficial; não instala rish) |
-| duckofduckers/Rish-PackageManager | fluxo install/uninstall | `st_install`/`st_uninstall` (tinyurl recusado) |
-| aliyoariel/shizuku-termux-installer | path absoluto do DEX no launcher | `src/bin/rish.in` (`@DEX@` injetado; gist/`curl|bash` recusado) |
+| austinsager/adv-install | `pm install` only if uid 2000 | `src/plugins/pm-install.sh` (via `rish -c "pm install ..."`) |
+| ConzZah/csb | start Shizuku daemon via adb | `src/plugins/start-daemon.sh` (official start.sh; does not install rish) |
+| duckofduckers/Rish-PackageManager | install/uninstall flow | `st_install`/`st_uninstall` (tinyurl refused) |
+| aliyoariel/shizuku-termux-installer | absolute DEX path in the launcher | `src/bin/rish.in` (`@DEX@` injected; gist/`curl|bash` refused) |
 
-## Ideia aproveitada (não consumidor, entra no núcleo)
+## Idea leveraged (not a consumer, enters the core)
 
-| Fonte | O que foi aproveitado | Onde |
-|-------|-------------------|------|
-| crowforkotlin/quick-shell | `--source latest` (download APK oficial via GitHub API) + fallback `libshizuku.so --apk=` para start do daemon; `adb-connect` (debug sem fio em 127.0.0.1 sem tcpip) + `wf` (abre Wireless Debugging) | `src/lib/extract-apk.sh` (`st_download_official_apk`), `src/plugins/start-daemon.sh`, `src/plugins/adb-connect.sh` |
-| auto-brevent (ideia) | `wait`: poll `rish -c true` até Shizuku responder | `src/lib/doctor.sh` (`st_wait`) |
-| GeneralKaos666/shizuku-termux | `tests/run-all.sh`, CI da suíte inteira, `${TMPDIR:-/tmp}`, `umask 022` no build-deb | reimplementado; tradução EN recusada |
-| rianprei/termux-adb | front-end `adb` unificado (OTG + nativo); resolução do binário via `st_adb` | `src/lib/paths.sh` (`st_adb_bin`, `st_adb`); código não copiado |
+| Source | What was leveraged | Where |
+|--------|--------------------|-------|
+| crowforkotlin/quick-shell | `--source latest` (download the official APK via GitHub API) + `libshizuku.so --apk=` fallback to start the daemon; `adb-connect` (wireless debugging on 127.0.0.1 without tcpip) + `wf` (opens Wireless Debugging) | `src/lib/extract-apk.sh` (`st_download_official_apk`), `src/plugins/start-daemon.sh`, `src/plugins/adb-connect.sh` |
+| auto-brevent (idea) | `wait`: poll `rish -c true` until Shizuku responds | `src/lib/doctor.sh` (`st_wait`) |
+| GeneralKaos666/shizuku-termux | `tests/run-all.sh`, whole-suite CI, `${TMPDIR:-/tmp}`, `umask 022` in build-deb | reimplemented; EN translation refused |
+| rianprei/termux-adb | unified `adb` front-end (OTG + native); binary resolution via `st_adb` | `src/lib/paths.sh` (`st_adb_bin`, `st_adb`); code not copied |
 
-## Veneno recusado (não entra no núcleo)
-tinyurl, `curl … | bash`, `gist … | bash`, DEX/`.so` no git, `chmod +w/+rwx` no DEX,
-`releases/latest/download/rish`, `pkg install shizuku`, `PKG` placeholder vivo,
-arquivo GPL do rish4termux.
+## Refused poison (does not enter the core)
+tinyurl, `curl … | bash`, `gist … | bash`, DEX/`.so` in git, `chmod +w/+rwx` on the DEX,
+`releases/latest/download/rish`, `pkg install shizuku`, live `PKG` placeholder,
+GPL file from rish4termux.
 
-## Consumidores (apenas docs, sem vendor)
-MCP, Telegram, Lucky Patcher, game booster — veja `docs/consumers.md`.
+## Consumers (docs only, no vendor)
+MCP, Telegram, Lucky Patcher, game booster — see `docs/consumers.md`.

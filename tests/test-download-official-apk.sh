@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Teste: st_apk_url_from_release_json com JSON fixture (sem rede real).
+# Test: st_apk_url_from_release_json with a JSON fixture (no real network).
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$SCRIPT_DIR/../src/lib/paths.sh"
 . "$SCRIPT_DIR/../src/lib/extract-apk.sh"
 
-# O source acima herda 'set -e' de extract-apk.sh; desabilitamos pois gerenciamos PASS/FAIL manualmente.
+# The source above inherits 'set -e' from extract-apk.sh; we disable it because we manage PASS/FAIL manually.
 set +e
 
 PASS=0; FAIL=0
 
-# ── Teste 1: JSON fixture com asset .apk válido ──
+# ── Test 1: JSON fixture with a valid .apk asset ──
 JSON1="$(mktemp)"
 cat > "$JSON1" <<'JSON'
 {
@@ -25,10 +25,10 @@ JSON
 
 url="$(st_apk_url_from_release_json "$JSON1")"
 [ "$url" = "https://github.com/RikkaApps/Shizuku/releases/download/v13.6.0/Shizuku.apk" ] && {
-    echo "OK: extraiu URL .apk do JSON"; PASS=$((PASS+1))
-} || { echo "FALHA: URL extraída incorreta: $url"; FAIL=$((FAIL+1)); }
+    echo "OK: extracted .apk URL from JSON"; PASS=$((PASS+1))
+} || { echo "FAIL: extracted URL is incorrect: $url"; FAIL=$((FAIL+1)); }
 
-# ── Teste 2: JSON sem asset .apk (apenas 'rish' fake) ──
+# ── Test 2: JSON without a .apk asset (only a fake 'rish') ──
 JSON2="$(mktemp)"
 cat > "$JSON2" <<'JSON'
 {
@@ -41,37 +41,37 @@ JSON
 
 url2="$(st_apk_url_from_release_json "$JSON2")"
 [ -z "$url2" ] && {
-    echo "OK: rejeitou JSON sem asset .apk"; PASS=$((PASS+1))
-} || { echo "FALHA: não deveria extrair .apk de JSON sem asset"; FAIL=$((FAIL+1)); }
+    echo "OK: rejected JSON without a .apk asset"; PASS=$((PASS+1))
+} || { echo "FAIL: should not have extracted .apk from JSON without asset"; FAIL=$((FAIL+1)); }
 
-# ── Teste 3: função existe ──
+# ── Test 3: functions exist ──
 command -v st_apk_url_from_release_json >/dev/null 2>&1 && {
-    echo "OK: função st_apk_url_from_release_json existe"; PASS=$((PASS+1))
-} || { echo "FALHA: função não encontrada"; FAIL=$((FAIL+1)); }
+    echo "OK: function st_apk_url_from_release_json exists"; PASS=$((PASS+1))
+} || { echo "FAIL: function not found"; FAIL=$((FAIL+1)); }
 
 command -v st_download_official_apk >/dev/null 2>&1 && {
-    echo "OK: função st_download_official_apk existe"; PASS=$((PASS+1))
-} || { echo "FALHA: função não encontrada"; FAIL=$((FAIL+1)); }
+    echo "OK: function st_download_official_apk exists"; PASS=$((PASS+1))
+} || { echo "FAIL: function not found"; FAIL=$((FAIL+1)); }
 
-# ── Teste 4: --source lê o próximo argumento e compara com 'latest' ──
+# ── Test 4: --source reads the next argument and compares with 'latest' ──
 SHIZUKU_SRC="$SCRIPT_DIR/../src/bin/shizuku"
 grep -q -- '--source)' "$SHIZUKU_SRC" && {
-    echo "OK: case --source presente no CLI"; PASS=$((PASS+1))
-} || { echo "FALHA: case --source ausente"; FAIL=$((FAIL+1)); }
+    echo "OK: case --source present in the CLI"; PASS=$((PASS+1))
+} || { echo "FAIL: case --source missing"; FAIL=$((FAIL+1)); }
 
-# O case --source deve fazer shift e comparar $1 com 'latest' (não source_latest=1 sem ler argumento)
+# The case --source must shift and compare $1 with 'latest' (not source_latest=1 without reading the argument)
 if grep -A3 -- '--source)' "$SHIZUKU_SRC" | grep -q 'shift' && grep -A3 -- '--source)' "$SHIZUKU_SRC" | grep -q 'case "\$1"'; then
-    echo "OK: --source lê o próximo argumento após shift"; PASS=$((PASS+1))
+    echo "OK: --source reads the next argument after shift"; PASS=$((PASS+1))
 else
-    echo "FALHA: --source não lê próximo argumento"; FAIL=$((FAIL+1)); fi
+    echo "FAIL: --source does not read the next argument"; FAIL=$((FAIL+1)); fi
 
-# Rejeita 'source_latest=1; shift' sem ler argumento (padrão antigo quebrado)
+# Rejects 'source_latest=1; shift' without reading the argument (broken old pattern)
 if grep -A1 -- '--source)' "$SHIZUKU_SRC" | grep -q 'source_latest=1'; then
-    echo "FALHA: --source ainda faz source_latest=1 sem ler argumento"; FAIL=$((FAIL+1))
+    echo "FAIL: --source still sets source_latest=1 without reading the argument"; FAIL=$((FAIL+1))
 else
-    echo "OK: --source não define source_latest sem ler argumento"; PASS=$((PASS+1)); fi
+    echo "OK: --source does not set source_latest without reading the argument"; PASS=$((PASS+1)); fi
 
 rm -f "$JSON1" "$JSON2"
 
-if [ $FAIL -eq 0 ]; then echo "RESULTADO: TESTES download-official-apk PASSARAM"; else echo "RESULTADO: $FAIL FALHA(S)"; fi
+if [ $FAIL -eq 0 ]; then echo "RESULT: download-official-apk tests PASSED"; else echo "RESULT: $FAIL FAILURE(S)"; fi
 exit $FAIL

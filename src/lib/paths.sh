@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# paths.sh — caminhos e helpers do núcleo shizuku-termux
-# Sourceável. Não executa sozinho.
+# paths.sh — paths and helpers of the shizuku-termux core
+# Sourceable. Does not run on its own.
 set -u
 
 st_prefix() { echo "${PREFIX:-${HOME:-/tmp}/.shizuku-termux-prefix}"; }
@@ -40,9 +40,9 @@ st_apk_path_via_pm() {
     "$(st_pm_path)" path moe.shizuku.privileged.api 2>/dev/null | sed 's/^package://' || true
 }
 
-# Resolve o binário adb a usar.
-# Ordem: ST_ADB (override de teste) -> ~/.local/bin/adb (front-end unificado)
-#        -> command -v adb (PATH) -> $PREFIX/bin/termux-adb (OTG patchado) -> falha.
+# Resolve which adb binary to use.
+# Order: ST_ADB (test override) -> ~/.local/bin/adb (unified front-end)
+#        -> command -v adb (PATH) -> $PREFIX/bin/termux-adb (OTG patched) -> fail.
 st_adb_bin() {
     if [ -n "${ST_ADB:-}" ] && [ -x "${ST_ADB}" ]; then
         echo "${ST_ADB}"
@@ -62,11 +62,11 @@ st_adb_bin() {
         echo "${PREFIX:-}/bin/termux-adb"
         return 0
     fi
-    echo "ERRO: adb ausente. Instale termux-adb: https://github.com/rianprei/termux-adb" >&2
+    echo "ERROR: adb not found. Install termux-adb: https://github.com/rianprei/termux-adb" >&2
     return 1
 }
 
-# Chama o binário adb resolvido com "$@".
+# Call the resolved adb binary with "$@".
 st_adb() {
     local bin
     bin="$(st_adb_bin)" || return $?

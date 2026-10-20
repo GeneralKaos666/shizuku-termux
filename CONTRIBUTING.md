@@ -1,25 +1,25 @@
 # Contributing
 
-## Testes host
+## Host tests
 
-Execute a suíte completa antes de abrir um PR:
+Run the full suite before opening a PR:
 
 ```bash
 bash tests/run-all.sh
 ```
 
-Todos os testes devem passar (exit 0). Os testes rodam no host, sem device e sem rede real para adb. Temporários usam `${TMPDIR:-/tmp}`; no Termux, `TMPDIR="$PREFIX/tmp"` se `/tmp` não for gravável.
+All tests must pass (exit 0). The tests run on the host, without a device and without a real adb network. Temporary files use `${TMPDIR:-/tmp}`, so on Termux set `TMPDIR="$PREFIX/tmp"` (or any writable directory) if `/tmp` is not writable.
 
-## Regras de pull request
+## Pull request rules
 
-- Nenhum `.dex`, `.so`, `.apk` ou `.deb` no git.
-- Nenhum `tinyurl`, `curl | bash` ou `gist | bash` no núcleo.
-- Nenhum `chmod +w` / `+rwx` no DEX.
-- Nenhum `PKG` placeholder vivo no launcher gerado.
-- Nenhum arquivo GPL do rish4termux copiado; reimplementar, não copiar.
-- Mensagens de commit no formato Conventional Commits (ex: `feat:`, `fix:`, `docs:`).
-- Não commite no vault pai (`tabs-agent-os`). Este repositório é autônomo.
+- No `.dex`, `.so`, `.apk` or `.deb` in git.
+- No `tinyurl`, `curl | bash` or `gist | bash` in the core.
+- No `chmod +w` / `+rwx` on the DEX.
+- No live `PKG` placeholder in the generated launcher.
+- No copied GPL file from rish4termux; reimplement, do not copy.
+- Commit messages in the Conventional Commits format (e.g. `feat:`, `fix:`, `docs:`).
+- Do not commit into the parent vault (`tabs-agent-os`). This repository is standalone.
 
-## Verificação de segredos
+## Secret check
 
-Antes de enviar um PR, confirme que não há chaves de API, tokens, senhas ou private keys nos arquivos rastreados.
+Before submitting a PR, confirm that there are no API keys, tokens, passwords or private keys in the tracked files.

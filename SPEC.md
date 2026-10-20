@@ -1,63 +1,63 @@
-# SPEC — Shizuku-for-Termux Fusion (núcleo)
+# SPEC — Shizuku-for-Termux Fusion (core)
 
-## 1. Paths (obrigatório)
+## 1. Paths (mandatory)
 
-| Item | Caminho | Notas |
-|------|---------|-------|
-| Diretório lib | `$PREFIX/lib/shizuku-termux/` | `$PREFIX` = prefixo do Termux |
-| Launcher real | `$PREFIX/lib/shizuku-termux/rish` | script POSIX sh, gerado de `src/bin/rish.in` |
-| DEX | `$PREFIX/lib/shizuku-termux/rish_shizuku.dex` | `chmod 400` (não-gravável) |
-| Native lib | `$PREFIX/lib/shizuku-termux/librish.so` | opcional, extraída do APK se existir |
-| Entrada bin | `$PREFIX/bin/rish` | wrapper de 3 linhas que `exec` o launcher real em `lib/shizuku-termux/rish`. |
-| Symlink CLI | `$PREFIX/bin/shizuku` | cópia do CLI `src/bin/shizuku` (dispatch por `$0`). |
-| Symlink CLI | `$PREFIX/bin/shk` | cópia do CLI `src/bin/shizuku` (dispatch por `$0`). |
+| Item | Path | Notes |
+|------|------|-------|
+| Lib directory | `$PREFIX/lib/shizuku-termux/` | `$PREFIX` = Termux prefix |
+| Real launcher | `$PREFIX/lib/shizuku-termux/rish` | POSIX sh script, generated from `src/bin/rish.in` |
+| DEX | `$PREFIX/lib/shizuku-termux/rish_shizuku.dex` | `chmod 400` (non-writable) |
+| Native lib | `$PREFIX/lib/shizuku-termux/librish.so` | optional, extracted from the APK if present |
+| Bin entry | `$PREFIX/bin/rish` | 3-line wrapper that `exec`s the real launcher in `lib/shizuku-termux/rish`. |
+| CLI symlink | `$PREFIX/bin/shizuku` | copy of the CLI `src/bin/shizuku` (dispatch by `$0`). |
+| CLI symlink | `$PREFIX/bin/shk` | copy of the CLI `src/bin/shizuku` (dispatch by `$0`). |
 
-## 2. Variáveis de ambiente
+## 2. Environment variables
 
-| Variável | Valor padrão | Obrigatório? |
-|----------|-------------|--------------|
-| `RISH_APPLICATION_ID` | `$TERMUX_APP__PACKAGE_NAME` se set, senão `com.termux` | SIM. Nunca `PKG`. |
-| `RISH_PRESERVE_ENV` | Não definido pelo wrapper. O loader Java do Shizuku honra se o usuário exportar; este wrapper não aplica default `0`/`1`. | Não. |
-| `ST_ADB` | Override do binário `adb` para testes. Se definido e executável, `st_adb` usa esse caminho. | Não. |
-| `ST_PLUGINS` | Não usado no núcleo. Todos os plugins de ponte carregam sempre; afeta apenas plugins futuros em `plugins/consumers/`. |
+| Variable | Default value | Required? |
+|----------|---------------|-----------|
+| `RISH_APPLICATION_ID` | `$TERMUX_APP__PACKAGE_NAME` if set, otherwise `com.termux` | YES. Never `PKG`. |
+| `RISH_PRESERVE_ENV` | Not set by the wrapper. The Shizuku Java loader honors it if the user exports it; this wrapper does not apply a default `0`/`1`. | No. |
+| `ST_ADB` | Override of the `adb` binary for tests. If set and executable, `st_adb` uses that path. | No. |
+| `ST_PLUGINS` | Not used in the core. All bridge plugins always load; it only affects future plugins in `plugins/consumers/`. |
 
-## 3. Exit codes (sem colisão)
+## 3. Exit codes (no collision)
 
-| Código | Significado |
-|--------|-------------|
+| Code | Meaning |
+|------|---------|
 | `0` | OK |
-| `1` | Uso inválido / argumento faltando |
-| `2` | Shizuku down (não responde / não instalado) |
-| `3` | DEX gravável / A14 (SDK ≥ 34 com DEX writable) |
-| `4` | APK Shizuku não encontrado (`moe.shizuku.privileged.api`) |
-| `5` | UID inesperado (`rish -c id` não é 2000 nem 0) |
-| `6` | DEX ou launcher ausente |
+| `1` | Invalid usage / missing argument |
+| `2` | Shizuku down (not responding / not installed) |
+| `3` | DEX writable / A14 (SDK ≥ 34 with writable DEX) |
+| `4` | Shizuku APK not found (`moe.shizuku.privileged.api`) |
+| `5` | Unexpected UID (`rish -c id` is neither 2000 nor 0) |
+| `6` | DEX or launcher missing |
 
-## 4. Verbos (único CLI `shizuku` / `shk` / `rish`)
+## 4. Verbs (single CLI `shizuku` / `shk` / `rish`)
 
-| Verbo | Faz |
-|-------|-----|
-| `install [--apk <arquivo>|--source latest]` | Extrai APK → `$PREFIX/lib/shizuku-termux/{rish,rish_shizuku.dex,librish.so?}`; `--apk` usa arquivo local; `--source latest` baixa APK oficial `*.apk` do release RikkaApps/Shizuku (GitHub API, nunca `releases/latest/download/rish`); sem nenhum dos dois e sem `pm`: exit 4. |
-| `doctor` | Shizuku up? dex existe? dex non-writable? RISH_APPLICATION_ID? `rish -c id` → uid |
-| `rish` | Launcher; falha se dex writable ou ausente |
+| Verb | Does |
+|------|------|
+| `install [--apk <file>|--source latest]` | Extracts APK → `$PREFIX/lib/shizuku-termux/{rish,rish_shizuku.dex,librish.so?}`; `--apk` uses a local file; `--source latest` downloads the official `*.apk` from the RikkaApps/Shizuku release (GitHub API, never `releases/latest/download/rish`); with neither and no `pm`: exit 4. |
+| `doctor` | Shizuku up? dex exists? dex non-writable? RISH_APPLICATION_ID? `rish -c id` → uid |
+| `rish` | Launcher; fails if dex is writable or missing |
 | `shizuku` / `shk` | `info|open|stop|exec|shell|version|doctor|install|uninstall|adb-connect|wait` |
 | `sui` | `--backend shizuku|sui` (default shizuku) |
-| `wireless` | `adb pair/connect IP:porta + código` (NÃO 127.0.0.1) |
+| `wireless` | `adb pair/connect IP:port + code` (NOT 127.0.0.1) |
 | `usb-loopback` | `adb tcpip 5555` + `connect 127.0.0.1:5555` |
-| `keepalive` | Mitiga phantom process |
-| `pm-install` | `pm install` só se `rish -c id` for uid 2000 |
-| `start-daemon` | Start daemon Shizuku via adb (não substitui app; não instala rish) |
-| `adb-connect` | Debug sem fio em 127.0.0.1: porta | pair | status | disconnect | wf |
-| `wait` | Espera Shizuku responder via `rish -c true` (timeout 60s, env `ST_WAIT_TIMEOUT`) |
-| `aliases` | Aliases opcionais `spm`/`sam` (plugin) |
-| `uninstall` | Limpa launcher/dex/symlink, sem tinyurl |
+| `keepalive` | Mitigates phantom process |
+| `pm-install` | `pm install` only if `rish -c id` is uid 2000 |
+| `start-daemon` | Start the Shizuku daemon via adb (does not replace the app; does not install rish) |
+| `adb-connect` | Wireless debugging on 127.0.0.1: port | pair | status | disconnect | wf |
+| `wait` | Waits for Shizuku to respond via `rish -c true` (60s timeout, env `ST_WAIT_TIMEOUT`) |
+| `aliases` | Optional `spm`/`sam` aliases (plugin) |
+| `uninstall` | Cleans launcher/dex/symlink, no tinyurl |
 
-## 5. Plugins de ponte (sempre existem; não dependem de ST_PLUGINS)
+## 5. Bridge plugins (always present; do not depend on ST_PLUGINS)
 
 `sui`, `wireless`, `keepalive`, `usb-loopback`, `pm-install`, `start-daemon`, `aliases`, `adb-connect`.
 
-ST_PLUGINS serve apenas para `plugins/consumers/` (MCP, Telegram, Lucky Patcher, game booster) — default off, sem vendor de binário alheio.
+ST_PLUGINS only serves `plugins/consumers/` (MCP, Telegram, Lucky Patcher, game booster) — default off, no vendoring of third-party binaries.
 
-## 6. Mapeamento de ABI (uname -m → arm ABI do APK)
+## 6. ABI mapping (uname -m → arm ABI of the APK)
 
-`aarch64 → arm64-v8a`, `armv7l|armv8l → armeabi-v7a`, `x86_64 → x86_64`, `i686 → x86`. Sem match: skip `.so` + aviso.
+`aarch64 → arm64-v8a`, `armv7l|armv8l → armeabi-v7a`, `x86_64 → x86_64`, `i686 → x86`. No match: skip `.so` + warning.

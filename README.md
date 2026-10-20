@@ -1,92 +1,92 @@
 # shizuku-termux
 
-Único CLI (`shizuku` / `shk` / `rish`) que instala, valida e usa o Shizuku/`rish` no Termux dentro do protocolo oficial da Rikka, fundindo as capacidades únicas dos wrappers comunitários e recusando supply-chain podre.
+Single CLI (`shizuku` / `shk` / `rish`) that installs, validates and uses Shizuku/`rish` in Termux within the official Rikka protocol, fusing the unique capabilities of the community wrappers and refusing rotten supply-chain practices.
 
-## Requisitos
+## Requirements
 
-- Termux (F-Droid ou Play Store) instalado no dispositivo
-- Aplicativo Shizuku oficial (`moe.shizuku.privileged.api`) instalado e iniciado
-- `unzip`, `bash`, `curl` disponíveis no Termux
+- Termux (F-Droid or Play Store) installed on the device
+- Official Shizuku app (`moe.shizuku.privileged.api`) installed and started
+- `unzip`, `bash`, `curl` available in Termux
 
-## Instalação no device
+## Installation on the device
 
 ```bash
-# Extrai o DEX e o launcher do APK Shizuku já instalado
+# Extracts the DEX and the launcher from the already installed Shizuku APK
 shizuku install
 
-# Ou a partir de um arquivo APK local
-shizuku install --apk /caminho/para/Shizuku.apk
+# Or from a local APK file
+shizuku install --apk /path/to/Shizuku.apk
 
-# Ou baixa o release oficial mais recente do GitHub da Rikka
+# Or download the latest official release from Rikka's GitHub
 shizuku install --source latest
 
-# Verifique a saúde da ponte
+# Check the health of the bridge
 shizuku doctor
 ```
 
-## Verbos do CLI
+## CLI verbs
 
-| Verbo | O que faz |
-|-------|-----------|
-| `install [--apk <caminho>] \| --source latest` | Extrai `rish` + `rish_shizuku.dex` (+ `librish.so`, `rish_sui.dex`) do APK; cria `$PREFIX/bin/rish` |
-| `doctor` | Checa: APK, DEX existe, DEX não-gravável, `RISH_APPLICATION_ID`, `rish -c id` |
-| `rish <args>` | Passa args ao launcher remoto |
+| Verb | What it does |
+|------|--------------|
+| `install [--apk <path>] \| --source latest` | Extracts `rish` + `rish_shizuku.dex` (+ `librish.so`, `rish_sui.dex`) from the APK; creates `$PREFIX/bin/rish` |
+| `doctor` | Checks: APK, DEX exists, DEX non-writable, `RISH_APPLICATION_ID`, `rish -c id` |
+| `rish <args>` | Passes args to the remote launcher |
 | `shizuku` / `shk` | `info\|open\|stop\|exec <cmd>\|shell\|version\|doctor\|install\|uninstall` |
-| `uninstall` | Remove launcher/DEX/árvore/symlink (sem tinyurl) |
-| `sui --backend shizuku\|sui` | Switch de backend (default shizuku) |
-| `wireless --target IP:porta --code XXX` | Emparelha adb via wireless (NÃO 127.0.0.1) |
+| `uninstall` | Removes launcher/DEX/tree/symlink (no tinyurl) |
+| `sui --backend shizuku\|sui` | Backend switch (default shizuku) |
+| `wireless --target IP:port --code XXX` | Pairs adb over wireless (NOT 127.0.0.1) |
 | `usb-loopback` | `adb tcpip 5555` + `connect 127.0.0.1:5555` |
-| `keepalive start\|stop\|status` | Heartbeat: reexecuta start.sh se `rish -c id` falhar |
-| `pm-install <apk>` | Instala APK via `rish` só se `uid 2000` |
-| `start-daemon` | Inicia daemon Shizuku via `start.sh` oficial (adb) |
-| `adb-connect <porta>` | Conecta debug sem fio em 127.0.0.1:PORTA (sem tcpip) |
-| `adb-connect pair <porta> <codigo>` | Emparelha adb sem fio em 127.0.0.1 |
-| `adb-connect status` | Lista dispositivos adb |
-| `adb-connect disconnect [porta]` | Desconecta (default 5555) |
-| `adb-connect wf` | Abre tela de Wireless Debugging (`am start`) |
-| `wait [segundos]` | Espera Shizuku responder via `rish -c true` (default 60s) |
-| `aliases` | Mostra `spm`/`sam` opcionais |
-| `help` | Esta ajuda |
+| `keepalive start\|stop\|status` | Heartbeat: reruns start.sh if `rish -c id` fails |
+| `pm-install <apk>` | Installs an APK via `rish` only if `uid 2000` |
+| `start-daemon` | Starts the Shizuku daemon via the official `start.sh` (adb) |
+| `adb-connect <port>` | Connects wireless debugging on 127.0.0.1:PORT (no tcpip) |
+| `adb-connect pair <port> <code>` | Pairs adb over wireless on 127.0.0.1 |
+| `adb-connect status` | Lists adb devices |
+| `adb-connect disconnect [port]` | Disconnects (default 5555) |
+| `adb-connect wf` | Opens the Wireless Debugging screen (`am start`) |
+| `wait [seconds]` | Waits for Shizuku to respond via `rish -c true` (default 60s) |
+| `aliases` | Shows the optional `spm`/`sam` |
+| `help` | This help |
 
-## Layout após o install
+## Layout after install
 
 ```
 $PREFIX/lib/shizuku-termux/
-  rish               launcher real (gerado de rish.in; PKG nunca fica vivo)
-  rish.in            template do launcher
-  rish_shizuku.dex   chmod 400 (não-gravável)
-  rish_sui.dex       chmod 400 (opcional, backend Sui)
-  librish.so         opcional, extraído do APK
-  backend            "shizuku" ou "sui"
-  lib/               paths.sh, extract-apk.sh, doctor.sh (sourcados pelo CLI)
+  rish               real launcher (generated from rish.in; PKG never stays alive)
+  rish.in            launcher template
+  rish_shizuku.dex   chmod 400 (non-writable)
+  rish_sui.dex       chmod 400 (optional, Sui backend)
+  librish.so         optional, extracted from the APK
+  backend            "shizuku" or "sui"
+  lib/               paths.sh, extract-apk.sh, doctor.sh (sourced by the CLI)
   plugins/           sui, wireless, keepalive, usb-loopback, pm-install,
                      start-daemon, adb-connect, aliases
-$PREFIX/bin/rish     wrapper de 3 linhas: exec do real em lib/
-$PREFIX/bin/shizuku  cópia do CLI (dispatch por $0)
-$PREFIX/bin/shk      cópia do CLI (dispatch por $0)
+$PREFIX/bin/rish     3-line wrapper: execs the real one in lib/
+$PREFIX/bin/shizuku  copy of the CLI (dispatch by $0)
+$PREFIX/bin/shk      copy of the CLI (dispatch by $0)
 ```
 
-## Companheiro: termux-adb
+## Companion: termux-adb
 
-Os verbos `wireless`, `usb-loopback`, `adb-connect` e `start-daemon` resolvem o binário `adb` através de `st_adb` (definido em `src/lib/paths.sh`). A ordem de resolução é:
+The `wireless`, `usb-loopback`, `adb-connect` and `start-daemon` verbs resolve the `adb` binary through `st_adb` (defined in `src/lib/paths.sh`). The resolution order is:
 
-1. Variável de ambiente `ST_ADB` (override para testes).
-2. `~/.local/bin/adb` — front-end unificado do [rianprei/termux-adb](https://github.com/rianprei/termux-adb), que roteia OTG (`termux-adb` + termux-usb) vs nativo (`$PREFIX/bin/adb`).
+1. Environment variable `ST_ADB` (test override).
+2. `~/.local/bin/adb` — unified front-end of [rianprei/termux-adb](https://github.com/rianprei/termux-adb), which routes OTG (`termux-adb` + termux-usb) vs native (`$PREFIX/bin/adb`).
 3. `command -v adb` (PATH).
-4. `$PREFIX/bin/termux-adb` (último recurso, patchado OTG).
+4. `$PREFIX/bin/termux-adb` (last resort, OTG patched).
 
-Nenhum instalador ou binário do termux-adb é vendido neste repositório.
+No installer or binary from termux-adb is sold in this repository.
 
-## Licença e atribuição
+## License and attribution
 
-Código próprio sob [MIT License](LICENSE). Ideias de origem dos wrappers comunitários em [ATTRIBUTION.md](ATTRIBUTION.md).
+Own code under the [MIT License](LICENSE). Ideas originating from the community wrappers are in [ATTRIBUTION.md](ATTRIBUTION.md).
 
-## Desenvolvimento
+## Development
 
-Os testes rodam no host (sem device):
+The tests run on the host (no device):
 
 ```bash
 bash tests/run-all.sh
 ```
 
-Veja [CONTRIBUTING.md](CONTRIBUTING.md) para regras de pull request.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for pull request rules.

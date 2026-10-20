@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Roda cada tests/test-*.sh num processo próprio. Sai ≠ 0 se algum falhar.
-# bash tests/test-*.sh só executa o primeiro arquivo (o resto vira argumento).
+# Run every host test (tests/test-*.sh) and exit non-zero if any fails.
+# Each test runs in its own bash process; they are independent.
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -19,5 +19,5 @@ for t in "$SCRIPT_DIR"/test-*.sh; do
 done
 
 echo "----------------------------------------"
-echo "TOTAL: $pass passou, $fail falhou"
+echo "TOTAL: $pass passed, $fail failed"
 [ "$fail" -eq 0 ]

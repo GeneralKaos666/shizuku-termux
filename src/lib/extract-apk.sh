@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# extract-apk.sh — extrai rish + dex do APK Shizuku (instalado via pm ou arquivo local).
-# Source paths.sh antes de usar.
+# extract-apk.sh — extracts rish + dex from the Shizuku APK (installed via pm or a local file).
+# Source paths.sh before using.
 set -euo pipefail
 
 st_require_unzip() {
-    command -v unzip >/dev/null 2>&1 || { echo "ERRO: unzip não encontrado" >&2; return 4; }
+    command -v unzip >/dev/null 2>&1 || { echo "ERROR: unzip not found" >&2; return 4; }
 }
 
-# Extrai assets/rish e assets/rish_shizuku.dex de um APK (zip) para $dest.
-# Modos: rish 755, dex 400. Recusa se faltar algum asset. Sem rede.
+# Extracts assets/rish and assets/rish_shizuku.dex from an APK (zip) into $dest.
+# Modes: rish 755, dex 400. Refuses if any asset is missing. No network.
 st_extract_from_apk() {
     local apk="$1" dest="$2"
-    [ -f "$apk" ] || { echo "ERRO: APK não encontrado: $apk" >&2; return 4; }
+    [ -f "$apk" ] || { echo "ERROR: APK not found: $apk" >&2; return 4; }
     st_require_unzip || return $?
     mkdir -p "$dest"
 
@@ -22,17 +22,17 @@ st_extract_from_apk() {
     found_rish="$(find "$tmpdir" -name rish -type f 2>/dev/null | head -1)"
     if [ -z "$found_rish" ]; then
         rm -rf "$tmpdir" 2>/dev/null || true
-        echo "ERRO: APK sem asset assets/rish" >&2; return 4
+        echo "ERROR: APK has no assets/rish asset" >&2; return 4
     fi
 
     unzip -o -q "$apk" 'assets/rish_shizuku.dex' -d "$tmpdir" 2>/dev/null || true
     found_dex="$(find "$tmpdir" -name rish_shizuku.dex -type f 2>/dev/null | head -1)"
     if [ -z "$found_dex" ]; then
         rm -rf "$tmpdir" 2>/dev/null || true
-        echo "ERRO: APK sem asset assets/rish_shizuku.dex" >&2; return 4
+        echo "ERROR: APK has no assets/rish_shizuku.dex asset" >&2; return 4
     fi
 
-    # DEX do backend Sui (opcional; usado se st_plugin_sui gravou backend=sui).
+    # Sui backend DEX (optional; used if st_plugin_sui wrote backend=sui).
     unzip -o -q "$apk" 'assets/rish_sui.dex' -d "$tmpdir" 2>/dev/null || true
     found_sui_dex="$(find "$tmpdir" -name rish_sui.dex -type f 2>/dev/null | head -1 || true)"
     if [ -n "$found_sui_dex" ]; then
@@ -40,7 +40,7 @@ st_extract_from_apk() {
         install -m 400 "$found_sui_dex" "$dest/rish_sui.dex"
     fi
 
-    # Unpack das libs nativas ANTES de procurar librish.so (caso contrário o .so nunca aparece).
+    # Unpack the native libs BEFORE searching for librish.so (otherwise the .so never shows up).
     unzip -o -q "$apk" 'lib/*/librish.so' -d "$tmpdir" 2>/dev/null || true
 
     install -m 755 "$found_rish" "$dest/rish"
@@ -54,7 +54,7 @@ st_extract_from_apk() {
         if [ -n "$found_so" ]; then
             install -m 755 "$found_so" "$dest/librish.so"
         else
-            echo "AVISO: lib/$abi/librish.so não encontrado no APK (pulado)" >&2
+            echo "WARNING: lib/$abi/librish.so not found in APK (skipped)" >&2
         fi
     fi
 
@@ -62,51 +62,51 @@ st_extract_from_apk() {
     return 0
 }
 
-# Extrai via `pm path moe.shizuku.privileged.api` (APK instalado no dispositivo).
+# Extracts via `pm path moe.shizuku.privileged.api` (APK installed on the device).
 st_extract_from_pm() {
     local apk dest="$1"
     apk="$(st_apk_path_via_pm)"
-    [ -n "$apk" ] || { echo "ERRO: APK moe.shizuku.privileged.api não instalado" >&2; return 4; }
+    [ -n "$apk" ] || { echo "ERROR: APK moe.shizuku.privileged.api not installed" >&2; return 4; }
     st_extract_from_apk "$apk" "$dest"
 }
 
-# Extrai a URL de download do asset .apk de um JSON de release do GitHub.
-# Só aceita URLs que terminam em .apk. Imprime a URL no stdout.
+# Extracts the download URL of the .apk asset from a GitHub release JSON.
+# Only accepts URLs ending in .apk. Prints the URL to stdout.
 st_apk_url_from_release_json() {
     local json_file="$1"
-    [ -f "$json_file" ] || { echo "ERRO: JSON não encontrado: $json_file" >&2; return 4; }
+    [ -f "$json_file" ] || { echo "ERROR: JSON not found: $json_file" >&2; return 4; }
     grep -o 'https://[^"]*\.apk' "$json_file" | head -1
 }
 
-# Baixa o APK oficial mais recente do RikkaApps/Shizuku via GitHub API.
-# Só aceita assets que terminam em .apk. Nunca baixa releases/latest/download/rish.
-# Grava o APK em $1. Retorna 4 em falha de rede ou URL inválida.
+# Downloads the latest official APK from RikkaApps/Shizuku via the GitHub API.
+# Only accepts assets ending in .apk. Never downloads releases/latest/download/rish.
+# Writes the APK to $1. Returns 4 on network failure or invalid URL.
 st_download_official_apk() {
     local out_apk="$1"
     local api_url="https://api.github.com/repos/RikkaApps/Shizuku/releases/latest"
     local tmp_json tmp_apk download_url status
 
-    command -v curl >/dev/null 2>&1 || { echo "ERRO: curl não encontrado" >&2; return 4; }
+    command -v curl >/dev/null 2>&1 || { echo "ERROR: curl not found" >&2; return 4; }
 
     tmp_json="$(mktemp)" || return 1
     tmp_apk="$(mktemp)" || { rm -f "$tmp_json"; return 1; }
     trap 'rm -f "$tmp_json" "$tmp_apk"' RETURN
 
     status="$(curl --fail --silent --show-error --output "$tmp_json" --write-out "%{http_code}" "$api_url" 2>/dev/null)" || {
-        echo "ERRO: falha na rede ao consultar GitHub API" >&2
+        echo "ERROR: network failure while querying the GitHub API" >&2
         return 4
     }
-    [ "$status" = "200" ] || { echo "ERRO: GitHub API retornou HTTP $status" >&2; return 4; }
+    [ "$status" = "200" ] || { echo "ERROR: GitHub API returned HTTP $status" >&2; return 4; }
 
     download_url="$(st_apk_url_from_release_json "$tmp_json")"
-    [ -n "$download_url" ] || { echo "ERRO: nenhum asset .apk encontrado no release" >&2; return 4; }
+    [ -n "$download_url" ] || { echo "ERROR: no .apk asset found in the release" >&2; return 4; }
 
     curl --fail --silent --show-error --location --output "$tmp_apk" "$download_url" 2>/dev/null || {
-        echo "ERRO: falha ao baixar APK oficial" >&2
+        echo "ERROR: failed to download the official APK" >&2
         return 4
     }
 
-    [ -s "$tmp_apk" ] || { echo "ERRO: APK baixado está vazio" >&2; return 4; }
+    [ -s "$tmp_apk" ] || { echo "ERROR: downloaded APK is empty" >&2; return 4; }
 
     cp "$tmp_apk" "$out_apk"
     return 0

@@ -1,57 +1,57 @@
 #!/usr/bin/env bash
-# Teste estático: plugin adb-connect.
+# Static test: adb-connect plugin.
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN="$SCRIPT_DIR/../src/plugins/adb-connect.sh"
 
-# O source de paths.sh herda 'set -euo pipefail' de extract-apk.sh; desligamos para gerenciar PASS/FAIL manualmente.
+# Sourcing paths.sh inherits 'set -euo pipefail' from extract-apk.sh; we disable it to manage PASS/FAIL manually.
 set +e
 set +u
 
 PASS=0; FAIL=0
 
-[ -f "$PLUGIN" ] || { echo "FALHA: plugin não encontrado"; exit 1; }
+[ -f "$PLUGIN" ] || { echo "FAIL: plugin not found"; exit 1; }
 
-echo "--- teste: contém CONNECT_HOST=127.0.0.1 ---"
-grep -q 'CONNECT_HOST="127.0.0.1"' "$PLUGIN" && { echo "OK: host fixo 127.0.0.1"; PASS=$((PASS+1)); } || { echo "FALHA: host nao e 127.0.0.1"; FAIL=$((FAIL+1)); }
+echo "--- test: contains CONNECT_HOST=127.0.0.1 ---"
+grep -q 'CONNECT_HOST="127.0.0.1"' "$PLUGIN" && { echo "OK: fixed host 127.0.0.1"; PASS=$((PASS+1)); } || { echo "FAIL: host is not 127.0.0.1"; FAIL=$((FAIL+1)); }
 
-echo "--- teste: contém st_adb connect ---"
-grep -q 'st_adb connect' "$PLUGIN" && { echo "OK: st_adb connect presente"; PASS=$((PASS+1)); } || { echo "FALHA: st_adb connect ausente"; FAIL=$((FAIL+1)); }
+echo "--- test: contains st_adb connect ---"
+grep -q 'st_adb connect' "$PLUGIN" && { echo "OK: st_adb connect present"; PASS=$((PASS+1)); } || { echo "FAIL: st_adb connect missing"; FAIL=$((FAIL+1)); }
 
-echo "--- teste: contém st_adb pair ---"
-grep -q 'st_adb pair' "$PLUGIN" && { echo "OK: st_adb pair presente"; PASS=$((PASS+1)); } || { echo "FALHA: st_adb pair ausente"; FAIL=$((FAIL+1)); }
+echo "--- test: contains st_adb pair ---"
+grep -q 'st_adb pair' "$PLUGIN" && { echo "OK: st_adb pair present"; PASS=$((PASS+1)); } || { echo "FAIL: st_adb pair missing"; FAIL=$((FAIL+1)); }
 
-echo "--- teste: contém st_adb disconnect ---"
-grep -q 'st_adb disconnect' "$PLUGIN" && { echo "OK: st_adb disconnect presente"; PASS=$((PASS+1)); } || { echo "FALHA: st_adb disconnect ausente"; FAIL=$((FAIL+1)); }
+echo "--- test: contains st_adb disconnect ---"
+grep -q 'st_adb disconnect' "$PLUGIN" && { echo "OK: st_adb disconnect present"; PASS=$((PASS+1)); } || { echo "FAIL: st_adb disconnect missing"; FAIL=$((FAIL+1)); }
 
-echo "--- teste: contém st_adb devices ---"
-grep -q 'st_adb devices' "$PLUGIN" && { echo "OK: st_adb devices presente"; PASS=$((PASS+1)); } || { echo "FALHA: st_adb devices ausente"; FAIL=$((FAIL+1)); }
+echo "--- test: contains st_adb devices ---"
+grep -q 'st_adb devices' "$PLUGIN" && { echo "OK: st_adb devices present"; PASS=$((PASS+1)); } || { echo "FAIL: st_adb devices missing"; FAIL=$((FAIL+1)); }
 
-echo "--- teste: contém wait-for-device ---"
-grep -q 'wait-for-device' "$PLUGIN" && { echo "OK: wait-for-device presente"; PASS=$((PASS+1)); } || { echo "FALHA: wait-for-device ausente"; FAIL=$((FAIL+1)); }
+echo "--- test: contains wait-for-device ---"
+grep -q 'wait-for-device' "$PLUGIN" && { echo "OK: wait-for-device present"; PASS=$((PASS+1)); } || { echo "FAIL: wait-for-device missing"; FAIL=$((FAIL+1)); }
 
-echo "--- teste: contém toggle_adb_wireless (wf) ---"
-grep -q 'toggle_adb_wireless' "$PLUGIN" && { echo "OK: toggle_adb_wireless presente"; PASS=$((PASS+1)); } || { echo "FALHA: toggle_adb_wireless ausente"; FAIL=$((FAIL+1)); }
+echo "--- test: contains toggle_adb_wireless (wf) ---"
+grep -q 'toggle_adb_wireless' "$PLUGIN" && { echo "OK: toggle_adb_wireless present"; PASS=$((PASS+1)); } || { echo "FAIL: toggle_adb_wireless missing"; FAIL=$((FAIL+1)); }
 
-echo "--- teste: NAO contem adb tcpip ---"
+echo "--- test: does NOT contain adb tcpip ---"
 if grep -Eq 'adb tcpip|tcpip ' "$PLUGIN"; then
-    echo "FALHA: contem adb tcpip (proibido)"; FAIL=$((FAIL+1))
+    echo "FAIL: contains adb tcpip (forbidden)"; FAIL=$((FAIL+1))
 else
-    echo "OK: sem adb tcpip"; PASS=$((PASS+1)); fi
+    echo "OK: no adb tcpip"; PASS=$((PASS+1)); fi
 
-echo "--- teste: NAO contem adb nu (deve ser st_adb) ---"
+echo "--- test: does NOT contain bare adb (must be st_adb) ---"
 if grep -Eq '\badb (connect|pair|disconnect|devices|start-server|shell)' "$PLUGIN"; then
-    echo "FALHA: contem adb nu (deve ser st_adb)"; FAIL=$((FAIL+1))
+    echo "FAIL: contains bare adb (must be st_adb)"; FAIL=$((FAIL+1))
 else
-    echo "OK: todo adb eh via st_adb"; PASS=$((PASS+1)); fi
+    echo "OK: every adb call goes through st_adb"; PASS=$((PASS+1)); fi
 
-echo "--- teste: CONNECT_HOST e' 127.0.0.1 e todo st_adb connect usa variavel ---"
-grep -q 'CONNECT_HOST="127.0.0.1"' "$PLUGIN" || { echo "FALHA: CONNECT_HOST nao e 127.0.0.1"; FAIL=$((FAIL+1)); }
+echo "--- test: CONNECT_HOST is 127.0.0.1 and every st_adb connect uses the variable ---"
+grep -q 'CONNECT_HOST="127.0.0.1"' "$PLUGIN" || { echo "FAIL: CONNECT_HOST is not 127.0.0.1"; FAIL=$((FAIL+1)); }
 if grep -Eq 'st_adb connect [^"$]' "$PLUGIN"; then
-    echo "FALHA: ha st_adb connect com host literal nao-variavel"; FAIL=$((FAIL+1))
+    echo "FAIL: st_adb connect with a non-variable literal host"; FAIL=$((FAIL+1))
 else
-    echo "OK: st_adb connect sempre usa variavel"; PASS=$((PASS+1)); fi
+    echo "OK: st_adb connect always uses the variable"; PASS=$((PASS+1)); fi
 
-if [ $FAIL -eq 0 ]; then echo "RESULTADO: TESTES adb-connect-static PASSARAM"; else echo "RESULTADO: $FAIL FALHA(S)"; fi
+if [ $FAIL -eq 0 ]; then echo "RESULT: adb-connect-static tests PASSED"; else echo "RESULT: $FAIL FAILURE(S)"; fi
 exit $FAIL

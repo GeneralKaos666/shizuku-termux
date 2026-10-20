@@ -1,10 +1,3 @@
----
-status: andamento
-fonte: 
-created: 2026-10-16
-updated: 2026-10-16
-title: CONTRIBUTING
----
 # Contributing
 
 ## Testes host
